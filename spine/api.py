@@ -171,19 +171,6 @@ class SpineAPI(View):
         """
         Returns the data passed in the request method data
         """
-        # TODO: se pudiera pasar los campos related directos
-        #       para hacer que puedan ser enviados desde el servidor
-        #       como objetos y extraer de ellos la llave foranea
-        #
-        #       Ej en CoffeeScript:
-        #           task.owner = owner
-        #           task.save()
-        #
-        #       Eso manda al servidor:
-        #       {'id': 1, text: 'tarea', 'owner': {'id': 1, 'name': 'felipe'}}
-        #
-        #       El server sabe que owner es un related, extrae su pk y lo salva
-        #
         if self._data is None:
             data = self._real_data
 
