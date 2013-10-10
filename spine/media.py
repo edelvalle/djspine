@@ -23,9 +23,9 @@
 #
 
 js = (
-    'jquery/jquery.js',
-    'spine/underscore.js',
-    'spine/helpers.js',
-    'spine/spine.js',
-    'spine/ajax.js'
+    'js/jquery.js',
+    'js/underscore.js',
+    'js/spine/spine.js',
+    'js/spine/ajax.js'
+    'js/spine-contrib/helpers.js',
 )
