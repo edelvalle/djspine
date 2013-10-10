@@ -35,22 +35,6 @@ csrfToken = $.getCookie 'csrftoken'
 $(document).ajaxSend (e, xhr, settings) ->
     xhr.setRequestHeader 'X-CSRFToken', csrfToken
 
-
-# Content editables with input events
-
-ENTER = 13
-
-$ ->
-    $contenteditables = $('[contenteditable]')
-    $contenteditables.keydown (e) ->
-        if e.keyCode is ENTER
-            e.preventDefault()
-            $(@).trigger 'change'
-
-    $contenteditables.blur (e) ->
-        $(@).trigger 'change'
-
-
 # Spine
 
 
