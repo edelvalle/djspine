@@ -86,7 +86,8 @@ def get_field_names(model):
 class BadRequest(HttpResponse):
     def __init__(self, content='Bad request', status=400, *args, **kwargs):
         super(BadRequest, self).__init__(
-                content=content, status=status, *args, **kwargs)
+            content=content, status=status, *args, **kwargs
+        )
 
 
 class SpineAPI(View):
@@ -322,7 +323,16 @@ class SpineAPI(View):
             item = form.save()
             return self.success_response(item)
         else:
-            return self.validation_error_response(form.errors)
+            if form.instance.pk:
+                item = self.model.objects.get(pk=form.instance.pk)
+            else:
+                item = form.instance
+
+            errors = {
+                name: '. '.join(msgs)
+                for name, msgs in form.errors.items()
+            }
+            return self.validation_error_response(item, errors)
 
     # Delete request
 
@@ -354,7 +364,7 @@ class SpineAPI(View):
         """
         return self.response(http_response_class=HttpResponse, *args, **kwargs)
 
-    def validation_error_response(self, output, *args, **kwargs):
+    def validation_error_response(self, item, output, *args, **kwargs):
         """
         Return an BadRequest indicating that input validation failed.
 
@@ -363,7 +373,7 @@ class SpineAPI(View):
         response format.
         By default, the output is a simple text response.
         """
-        output = {'errors': output}
+        output = {'item': item, 'errors': output}
         return self.response(
             output=output,
             http_response_class=BadRequest,
