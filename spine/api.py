@@ -438,7 +438,7 @@ class SpineAPI(View):
 
     @classmethod
     def _get_url_pattern(cls, add_pk=False):
-        pk_pattern = cls.pk_pattern if add_pk else r''
+        pk_pattern = '/' + cls.pk_pattern if add_pk else r''
         my_url = r'^{0}{1}$'.format(cls.get_url()[1:], pk_pattern)
 
         pk_name = cls.pk_name if add_pk else ''
@@ -452,7 +452,7 @@ class SpineAPI(View):
         return url_pattern
 
     @classmethod
-    def get_url(cls, url_pattern=r'/api/{0}/{1}/'):
+    def get_url(cls, url_pattern=r'/api/{0}/{1}'):
         args = cls.get_application_label(), cls.get_model_name()
         return url_pattern.format(*args)
 
