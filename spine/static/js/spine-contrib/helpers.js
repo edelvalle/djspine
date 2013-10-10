@@ -11,6 +11,10 @@
     };
   };
 
+  $.fn.htmlTemplate = function() {
+    return this.html().trim();
+  };
+
   $.getCookies = function() {
     var attr_name, cookie, cookies, value, _i, _len, _ref, _ref1;
     cookies = {};

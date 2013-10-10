@@ -2,6 +2,10 @@
 $.query = (query_data) ->
     data: JSON.stringify(query_data or {})
 
+
+$.fn.htmlTemplate = ->
+    @html().trim()
+
 #
 # Cookies
 #
