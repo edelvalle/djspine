@@ -83,7 +83,7 @@ class Command(BaseCommand):
             output = self.spine_model_template.render(context)
             spine_model_file.write(output)
 
-        os.system('coffee -c %s' % spine_model_path)
+        os.system('coffee -cm %s' % spine_model_path)
 
 
 # SpineAPI introspection
