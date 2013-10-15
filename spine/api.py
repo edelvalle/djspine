@@ -97,7 +97,7 @@ class SpineAPI(View):
 
     Supported operations (copied from spine.js docs):
         create -> POST   /api/app_name/ModelName
-        read ->   GET    /api/app_name/ModelName[/id]
+        read   -> GET    /api/app_name/ModelName[/id]
         update -> PUT    /api/app_name/ModelName/id
         delete -> DELETE /api/app_name/ModelName/id
     """

@@ -7,7 +7,8 @@
 
   $.query = function(query_data) {
     return {
-      data: JSON.stringify(query_data || {})
+      data: JSON.stringify(query_data || {}),
+      contentType: 'application/json'
     };
   };
 

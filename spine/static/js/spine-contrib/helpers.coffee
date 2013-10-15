@@ -1,6 +1,7 @@
 
 $.query = (query_data) ->
     data: JSON.stringify(query_data or {})
+    contentType: 'application/json'
 
 
 $.fn.htmlTemplate = ->
