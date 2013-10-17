@@ -373,7 +373,7 @@ class SpineAPI(View):
         response format.
         By default, the output is a simple text response.
         """
-        output = {'item': item, 'errors': output}
+        output = {'instance': item, 'errors': output}
         return self.response(
             output=output,
             http_response_class=BadRequest,
