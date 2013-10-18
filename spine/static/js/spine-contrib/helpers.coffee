@@ -214,3 +214,31 @@ class Spine?.ModalController extends Spine.Controller
 
     save: =>
         @body_controller?.save?()
+
+
+class Spine?.DropdownController extends Spine.Controller
+    elements:
+        '*': 'children'
+
+    constructor: ->
+        super
+        @el.bind 'mouseout', @hide
+
+    show: (e) =>
+        if e?
+            @log e
+            @el.css
+                left: e.pageX - 10
+                top: e.pageY - 17
+        @el.slideDown 'fast'
+
+
+    hide: (e) =>
+        to_element = e?.toElement
+        if to_element not in @all_elements()
+            @el.slideUp 'fast'
+
+    all_elements: ->
+        children = @children.toArray()
+        children.push @el[0]
+        children

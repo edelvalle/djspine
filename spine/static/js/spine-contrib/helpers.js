@@ -3,7 +3,8 @@
   var ENTER, csrfToken,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   $.query = function(query_data) {
     return {
@@ -332,6 +333,52 @@
       };
 
       return ModalController;
+
+    })(Spine.Controller);
+  };
+
+    if (typeof Spine !== "undefined" && Spine !== null) {
+    Spine.DropdownController = (function(_super) {
+      __extends(DropdownController, _super);
+
+      DropdownController.prototype.elements = {
+        '*': 'children'
+      };
+
+      function DropdownController() {
+        this.hide = __bind(this.hide, this);
+        this.show = __bind(this.show, this);
+        DropdownController.__super__.constructor.apply(this, arguments);
+        this.el.bind('mouseout', this.hide);
+      }
+
+      DropdownController.prototype.show = function(e) {
+        if (e != null) {
+          this.log(e);
+          this.el.css({
+            left: e.pageX - 10,
+            top: e.pageY - 17
+          });
+        }
+        return this.el.slideDown('fast');
+      };
+
+      DropdownController.prototype.hide = function(e) {
+        var to_element;
+        to_element = e != null ? e.toElement : void 0;
+        if (__indexOf.call(this.all_elements(), to_element) < 0) {
+          return this.el.slideUp('fast');
+        }
+      };
+
+      DropdownController.prototype.all_elements = function() {
+        var children;
+        children = this.children.toArray();
+        children.push(this.el[0]);
+        return children;
+      };
+
+      return DropdownController;
 
     })(Spine.Controller);
   };
