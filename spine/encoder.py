@@ -41,16 +41,16 @@ class SpineJSONEncoder(json.JSONEncoder):
         elif type(obj) in api_handlers:
             api_handler = api_handlers[type(obj)]
             local, single, multiple = api_handler.get_serialize_fields()
-            obj = object_to_dict(obj, chain(local , single, multiple))
+            obj = object_to_dict(obj, chain(local, single, multiple))
             for field_name in obj.keys():
                 if field_name in single:
                     instance = obj.pop(field_name)
                     if instance is not None:
-                        obj[field_name + '_id'] = instance.pk
+                        instance = instance.pk
+                    obj[field_name + '_id'] = instance
                 elif field_name in multiple:
-                    obj[field_name + '_id'] = [
-                        o.pk for o in obj.pop(field_name).all()
-                    ]
+                    qs = obj.pop(field_name).all()
+                    obj[field_name + '_id'] = qs.values_list('pk', flat=True)
             return obj
 
         elif callable(obj):

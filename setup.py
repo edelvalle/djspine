@@ -37,5 +37,6 @@ setup(
     setup_requires=['setuptools-git'],
     install_requires=[
         'Django',
+        'xoutil'
     ],
 )

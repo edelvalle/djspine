@@ -61,10 +61,7 @@ def object_to_dict(obj, attrs):
         value = getattr(obj, attr, None)
         if callable(value):
             value = value()
-
-        if value is not None:
-            result[attr] = value
-
+        result[attr] = value
     return result
 
 

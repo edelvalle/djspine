@@ -26,6 +26,8 @@
 import json
 from itertools import chain
 
+from xoutil.string import cut_suffix
+
 from django.db.models.query import QuerySet
 from django.db.models.fields import related
 from django.forms.models import modelform_factory
@@ -180,16 +182,15 @@ class SpineAPI(View):
                 data.pop(self.page_param_name)
 
             # Extract the pks of related fields
-            for field_name, value in data.items():
-                if isinstance(value, dict):
-                    field, _, _, _ = self.model._meta.get_field_by_name(
-                        field_name
-                    )
-                    if field.rel:
-                        pk_name = field.rel.to._meta.pk.name
-                        if pk_name in value:
-                            data[field_name] = value[pk_name]
+            local, single, multiple = self.get_serialize_fields()
+            relational = list(chain(single, multiple))
 
+            for field_name, value in data.items():
+                cuted_field = cut_suffix(field_name, '_id')
+                if field_name.endswith('_id') and cuted_field in relational:
+                    field_name = cuted_field
+                data[field_name] = value
+            print data
             self._data = data
         return self._data
 
@@ -481,14 +482,12 @@ class SpineAPI(View):
         return cls._serialize_fields_cache
 
     @classmethod
-    def get_all_serialize_field_names(cls):
+    def get_all_serialize_fields(cls):
         local, single, multiple = cls.get_serialize_fields()
-        fields = [f + '_id' for f in chain(single, multiple)]
-        fields.extend(local)
-        return fields
+        return chain(local, single, multiple)
 
     @classmethod
     def get_form_fields(cls):
-        fields = cls.get_all_serialize_field_names()
+        fields = cls.get_all_serialize_fields()
         model_fields = cls.model._meta.get_all_field_names()
         return [f for f in fields if f in model_fields]
