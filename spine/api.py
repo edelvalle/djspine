@@ -329,7 +329,7 @@ class SpineAPI(View):
                 item = form.instance
 
             errors = {
-                name: '. '.join(msgs)
+                name: ' '.join(msgs)
                 for name, msgs in form.errors.items()
             }
             return self.validation_error_response(item, errors)
