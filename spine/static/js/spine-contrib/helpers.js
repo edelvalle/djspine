@@ -127,7 +127,7 @@
           return _this.instance = _.extend(_this.instance, instance);
         })();
         return (show_errors = function() {
-          var attr, field, msg, _results;
+          var attr, msg, _results;
           if (errors.__all__ != null) {
             _this.el.prepend("<div class=\"alert hide alert-error text-center\">\n    " + errors.__all__ + "\n</div>");
             _this.$('.alert').slideDown();
@@ -135,10 +135,9 @@
           _results = [];
           for (attr in errors) {
             msg = errors[attr];
-            field = _this.get_field(attr);
-            _results.push((field.parents('.control-group')).addClass('error').tooltip({
+            _results.push((_this.get_field(attr)).parents('.control-group').addClass('error').tooltip({
               title: msg
-            }));
+            }).tooltip('show'));
           }
           return _results;
         })();

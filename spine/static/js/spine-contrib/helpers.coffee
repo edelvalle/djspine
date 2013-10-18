@@ -42,7 +42,7 @@ class Spine?.FormController extends Spine.Controller
         '[name]': 'fields'
         '.control-group': 'control_groups'
 
-    get_field: (name) -> @fields.filter("[name=#{name}]")
+    get_field: (name) -> @fields.filter "[name=#{name}]"
 
     constructor: ->
         super
@@ -96,10 +96,11 @@ class Spine?.FormController extends Spine.Controller
                 @$('.alert').slideDown()
 
             for attr, msg of errors
-                field = @get_field attr
-                (field.parents '.control-group')
+                (@get_field attr)
+                    .parents('.control-group')
                     .addClass('error')
-                    .tooltip title: msg
+                    .tooltip(title: msg)
+                    .tooltip('show')
 
     hide_errors: =>
         (@control_groups.removeClass 'error').tooltip 'destroy'
