@@ -37,30 +37,6 @@ $(document).ajaxSend (e, xhr, settings) ->
     xhr.setRequestHeader 'X-CSRFToken', csrfToken
 
 
-class Spine?.ModalController extends Spine.Controller
-    elements:
-        '.title': 'title'
-        'form': 'form'
-
-    events:
-        'click .cancel': 'hide'
-        'click .save': 'save'
-
-    show: (@instance, options)=>
-          title.html options?.title or @title.html()
-          # bind instance ajaxError and ajaxSuccess -> hide
-          # pupulate the form using the instance
-
-    hide: =>
-        # @instance.unbind ajaxError and ajaxSucess
-        @instance = null
-        @el.modal 'hide'
-
-    save: =>
-        @instance.fromForm @form
-        @instance.save() # bind errors and such things
-
-
 class Spine?.FormController extends Spine.Controller
     elements:
         '[name]': 'fields'
@@ -74,6 +50,7 @@ class Spine?.FormController extends Spine.Controller
         @init_instance()
 
     init_instance: (options) ->
+        @instance = options.instance if options?.instance?
         if options?.force
             @instance = new @Model
         else
@@ -110,6 +87,14 @@ class Spine?.FormController extends Spine.Controller
             @instance = _.extend(@instance, instance)
 
         do show_errors = =>
+            if errors.__all__?
+                @el.prepend """
+                    <div class="alert hide alert-error text-center">
+                        #{errors.__all__}
+                    </div>
+                """
+                @$('.alert').slideDown()
+
             for attr, msg of errors
                 field = @get_field attr
                 (field.parents '.control-group')
@@ -118,12 +103,14 @@ class Spine?.FormController extends Spine.Controller
 
     hide_errors: =>
         (@control_groups.removeClass 'error').tooltip 'destroy'
+        @$('.alert').slideUp 'fast', -> @remove()
 
     reset_form: =>
         @fields.val ''
         @hide_errors()
 
     populate_fields: =>
+        @reset_form()
         for attr in @instance.attributes()
             (@get_field attr).val @instance[attr]
 
@@ -155,6 +142,7 @@ class Spine?.FormController extends Spine.Controller
         @reset_form()
         @instance = _.extend(@instance, server_data)
         @unbind_instance()
+        @parent?.hide?()
 
 ENTER = 13
 
@@ -189,3 +177,39 @@ class Spine?.ItemController extends Spine.FormController
     populate_fields: =>
     reset_form: =>
     unbind_instance: =>
+
+
+class Spine?.ModalController extends Spine.Controller
+    elements:
+        '.title': 'title'
+        '.modal-body': 'body'
+        '[name]:visible': 'first_visible_field'
+
+    events:
+        'click .cancel': 'hide'
+        'click .save': 'save'
+
+     constructor: ->
+        super
+        @el.on 'hidden', @hidden
+        @el.on 'shown', @shown
+        @body_controller = new @BodyController
+            parent: @
+            el: @body
+
+    show: (title, options)=>
+        @title.html title if title?
+        @body_controller.init_instance options
+        @el.modal 'show'
+
+    hide: =>
+        @el.modal 'hide'
+
+    hidden: =>
+        @body_controller.init_instance force: true
+
+    shown: =>
+        @$('[name]:visible').focus()
+
+    save: =>
+        @body_controller?.save?()
