@@ -42,7 +42,15 @@ class Spine?.FormController extends Spine.Controller
         '[name]': 'fields'
         '.control-group': 'control_groups'
 
-    get_field: (name) -> @fields.filter "[name=#{name}]"
+    get_field: (name) ->
+        @fields.filter "[name=#{name}]"
+
+    field_value: (name, value) ->
+        field = @get_field name
+        if value?
+            field.val value
+        else
+            field.val()
 
     constructor: ->
         super
@@ -85,6 +93,7 @@ class Spine?.FormController extends Spine.Controller
             if @instance.cid is @instance.id
                 @instance.id = null
             @instance = _.extend(@instance, instance)
+            @instance.trigger 'update'
 
         do show_errors = =>
             if errors.__all__?
@@ -112,19 +121,15 @@ class Spine?.FormController extends Spine.Controller
 
     populate_fields: =>
         @reset_form()
-        for attr in @instance.attributes()
-            (@get_field attr).val @instance[attr]
+        for attr, value of @instance.attributes()
+            @field_value attr, value
 
     populate_instance: =>
         modified = false
         for field in @fields
             $field = $ field
             name = $field.attr 'name'
-            if field.contentEditable is 'true'
-                value = $field.html().trim()
-            else
-                value = $field.val()
-
+            value = @field_value name
             if @instance[name] isnt value
                 @instance[name] = value
                 modified = true
@@ -142,12 +147,16 @@ class Spine?.FormController extends Spine.Controller
     on_saved: (_instance, server_data) =>
         @reset_form()
         @instance = _.extend(@instance, server_data)
+        @instance.trigger 'update'
         @unbind_instance()
         @parent?.hide?()
 
 ENTER = 13
 
 class Spine?.ItemController extends Spine.FormController
+    elements:
+        '[contenteditable]': 'fields'
+        '[contenteditable]': 'control_groups'
 
     events:
         'keydown [contenteditable][name]': 'trigger_field_change'
@@ -157,9 +166,16 @@ class Spine?.ItemController extends Spine.FormController
     constructor: ->
         super
 
+    field_value: (name, value) ->
+        field = @get_field name
+        if value?
+            field.text _.escape value
+        else
+            _.unescape (field.text() or '').trim()
+
     bind_instance: =>
         super
-        @instance.bind 'update', @render
+        @instance.bind 'update', @populate_fields
         @instance.bind 'destroy', @destroy
 
     trigger_field_change: (e) =>
@@ -169,14 +185,19 @@ class Spine?.ItemController extends Spine.FormController
         if e.type is 'focusout' or e.keyCode is ENTER
             $(e.target).trigger 'change'
 
+    destroy_instance: =>
+        @instance.destroy() if confirm 'Sure?'
+
     destroy: =>
         @el.fadeOut 'fast', @release
 
     render: =>
         @replace @template @instance
 
-    populate_fields: =>
     reset_form: =>
+        @fields.text('')
+        @hide_errors()
+
     unbind_instance: =>
 
 
@@ -217,26 +238,30 @@ class Spine?.ModalController extends Spine.Controller
 
 
 class Spine?.DropdownController extends Spine.Controller
+    events:
+        'click li': 'hide'
+
     elements:
         '*': 'children'
 
     constructor: ->
         super
-        @el.bind 'mouseout', @hide
+        @el.bind 'mouseout', @mouseout
 
     show: (e) =>
-        if e?
-            @log e
-            @el.css
-                left: e.pageX - 10
-                top: e.pageY - 17
+        if e?.pageX? and e.pageY
+            do positionate_under_the_mouse = =>
+                @el.css
+                    left: e.pageX - 10
+                    top: e.pageY - 17
         @el.slideDown 'fast'
 
-
-    hide: (e) =>
+    mouseout: (e) =>
         to_element = e?.toElement
-        if to_element not in @all_elements()
-            @el.slideUp 'fast'
+        @hide() if to_element not in @all_elements()
+
+    hide: =>
+        @el.slideUp 'fast'
 
     all_elements: ->
         children = @children.toArray()

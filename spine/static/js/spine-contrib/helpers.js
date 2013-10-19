@@ -64,6 +64,16 @@
         return this.fields.filter("[name=" + name + "]");
       };
 
+      FormController.prototype.field_value = function(name, value) {
+        var field;
+        field = this.get_field(name);
+        if (value != null) {
+          return field.val(value);
+        } else {
+          return field.val();
+        }
+      };
+
       function FormController() {
         this.on_saved = __bind(this.on_saved, this);
         this.save = __bind(this.save, this);
@@ -125,7 +135,8 @@
           if (_this.instance.cid === _this.instance.id) {
             _this.instance.id = null;
           }
-          return _this.instance = _.extend(_this.instance, instance);
+          _this.instance = _.extend(_this.instance, instance);
+          return _this.instance.trigger('update');
         })();
         return (show_errors = function() {
           var attr, msg, _results;
@@ -157,13 +168,13 @@
       };
 
       FormController.prototype.populate_fields = function() {
-        var attr, _i, _len, _ref, _results;
+        var attr, value, _ref, _results;
         this.reset_form();
         _ref = this.instance.attributes();
         _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          attr = _ref[_i];
-          _results.push((this.get_field(attr)).val(this.instance[attr]));
+        for (attr in _ref) {
+          value = _ref[attr];
+          _results.push(this.field_value(attr, value));
         }
         return _results;
       };
@@ -176,11 +187,7 @@
           field = _ref[_i];
           $field = $(field);
           name = $field.attr('name');
-          if (field.contentEditable === 'true') {
-            value = $field.html().trim();
-          } else {
-            value = $field.val();
-          }
+          value = this.field_value(name);
           if (this.instance[name] !== value) {
             this.instance[name] = value;
             modified = true;
@@ -209,6 +216,7 @@
         var _ref;
         this.reset_form();
         this.instance = _.extend(this.instance, server_data);
+        this.instance.trigger('update');
         this.unbind_instance();
         return (_ref = this.parent) != null ? typeof _ref.hide === "function" ? _ref.hide() : void 0 : void 0;
       };
@@ -224,6 +232,11 @@
     Spine.ItemController = (function(_super) {
       __extends(ItemController, _super);
 
+      ItemController.prototype.elements = {
+        '[contenteditable]': 'fields',
+        '[contenteditable]': 'control_groups'
+      };
+
       ItemController.prototype.events = {
         'keydown [contenteditable][name]': 'trigger_field_change',
         'blur [contenteditable][name]': 'trigger_field_change',
@@ -233,17 +246,27 @@
       function ItemController() {
         this.unbind_instance = __bind(this.unbind_instance, this);
         this.reset_form = __bind(this.reset_form, this);
-        this.populate_fields = __bind(this.populate_fields, this);
         this.render = __bind(this.render, this);
         this.destroy = __bind(this.destroy, this);
+        this.destroy_instance = __bind(this.destroy_instance, this);
         this.trigger_field_change = __bind(this.trigger_field_change, this);
         this.bind_instance = __bind(this.bind_instance, this);
         ItemController.__super__.constructor.apply(this, arguments);
       }
 
+      ItemController.prototype.field_value = function(name, value) {
+        var field;
+        field = this.get_field(name);
+        if (value != null) {
+          return field.text(_.escape(value));
+        } else {
+          return _.unescape((field.text() || '').trim());
+        }
+      };
+
       ItemController.prototype.bind_instance = function() {
         ItemController.__super__.bind_instance.apply(this, arguments);
-        this.instance.bind('update', this.render);
+        this.instance.bind('update', this.populate_fields);
         return this.instance.bind('destroy', this.destroy);
       };
 
@@ -256,6 +279,12 @@
         }
       };
 
+      ItemController.prototype.destroy_instance = function() {
+        if (confirm('Sure?')) {
+          return this.instance.destroy();
+        }
+      };
+
       ItemController.prototype.destroy = function() {
         return this.el.fadeOut('fast', this.release);
       };
@@ -264,9 +293,10 @@
         return this.replace(this.template(this.instance));
       };
 
-      ItemController.prototype.populate_fields = function() {};
-
-      ItemController.prototype.reset_form = function() {};
+      ItemController.prototype.reset_form = function() {
+        this.fields.text('');
+        return this.hide_errors();
+      };
 
       ItemController.prototype.unbind_instance = function() {};
 
@@ -341,34 +371,46 @@
     Spine.DropdownController = (function(_super) {
       __extends(DropdownController, _super);
 
+      DropdownController.prototype.events = {
+        'click li': 'hide'
+      };
+
       DropdownController.prototype.elements = {
         '*': 'children'
       };
 
       function DropdownController() {
         this.hide = __bind(this.hide, this);
+        this.mouseout = __bind(this.mouseout, this);
         this.show = __bind(this.show, this);
         DropdownController.__super__.constructor.apply(this, arguments);
-        this.el.bind('mouseout', this.hide);
+        this.el.bind('mouseout', this.mouseout);
       }
 
       DropdownController.prototype.show = function(e) {
-        if (e != null) {
-          this.log(e);
-          this.el.css({
-            left: e.pageX - 10,
-            top: e.pageY - 17
-          });
+        var positionate_under_the_mouse,
+          _this = this;
+        if (((e != null ? e.pageX : void 0) != null) && e.pageY) {
+          (positionate_under_the_mouse = function() {
+            return _this.el.css({
+              left: e.pageX - 10,
+              top: e.pageY - 17
+            });
+          })();
         }
         return this.el.slideDown('fast');
       };
 
-      DropdownController.prototype.hide = function(e) {
+      DropdownController.prototype.mouseout = function(e) {
         var to_element;
         to_element = e != null ? e.toElement : void 0;
         if (__indexOf.call(this.all_elements(), to_element) < 0) {
-          return this.el.slideUp('fast');
+          return this.hide();
         }
+      };
+
+      DropdownController.prototype.hide = function() {
+        return this.el.slideUp('fast');
       };
 
       DropdownController.prototype.all_elements = function() {
