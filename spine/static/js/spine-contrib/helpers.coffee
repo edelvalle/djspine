@@ -47,6 +47,12 @@ $(document).ajaxSend (e, xhr, settings) ->
     xhr.setRequestHeader 'X-CSRFToken', csrfToken
 
 
+update = (old_instance, instance) ->
+    instance = _.extend old_instance, instance
+    instance.trigger 'update'
+    instance
+
+
 class Spine?.FormController extends Spine.Controller
     elements:
         '[name]': 'fields'
@@ -102,8 +108,7 @@ class Spine?.FormController extends Spine.Controller
         do restore_instance_state = =>
             if @instance.cid is @instance.id
                 @instance.id = null
-            @instance = _.extend(@instance, instance)
-            @instance.trigger 'update'
+            @instance = update @instance, instance
 
         do show_errors = =>
             if errors.__all__?
@@ -154,10 +159,9 @@ class Spine?.FormController extends Spine.Controller
             @hide_errors()
             @instance.save()
 
-    on_saved: (_instance, server_data) =>
+    on_saved: (old_instance, new_instance) =>
         @reset_form()
-        @instance = _.extend(@instance, server_data)
-        @instance.trigger 'update'
+        @instance= update @instance, new_instance
         @unbind_instance()
         @parent?.hide?()
 
