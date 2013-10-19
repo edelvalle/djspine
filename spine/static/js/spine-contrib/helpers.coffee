@@ -7,6 +7,16 @@ $.query = (query_data) ->
 $.fn.htmlTemplate = ->
     @html().trim()
 
+$.getSelectedElements = (selector) ->
+    selection = window.getSelection()
+    range = []
+    if selection.rangeCount
+        range = selection.getRangeAt(0).cloneContents().childNodes
+    if selector?
+        jQuery selector, range
+    else
+        jQuery range
+
 #
 # Cookies
 #

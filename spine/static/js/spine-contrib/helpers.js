@@ -17,6 +17,20 @@
     return this.html().trim();
   };
 
+  $.getSelectedElements = function(selector) {
+    var range, selection;
+    selection = window.getSelection();
+    range = [];
+    if (selection.rangeCount) {
+      range = selection.getRangeAt(0).cloneContents().childNodes;
+    }
+    if (selector != null) {
+      return jQuery(selector, range);
+    } else {
+      return jQuery(range);
+    }
+  };
+
   $.getCookies = function() {
     var attr_name, cookie, cookies, value, _i, _len, _ref, _ref1;
     cookies = {};
