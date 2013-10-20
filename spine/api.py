@@ -53,10 +53,8 @@ def get_field_names(model):
     """
     global _model_field_names_cache
     if model not in _model_field_names_cache:
-        local = [
-            (field.name, None) for field in model._meta.fields
-            if not field.rel
-        ]
+        local = [field.name for field in model._meta.fields if not field.rel]
+        local.append('__unicode__')
 
         single, multiple = [], []
 
@@ -68,19 +66,20 @@ def get_field_names(model):
             related.ReverseSingleRelatedObjectDescriptor: single,
         }
 
-        fields = [(fname, getattr(model, fname)) for fname in dir(model)]
+        fields = [
+            (fname, getattr(model, fname))
+            for fname in dir(model)
+            if fname not in local
+        ]
+
         for field_name, field in fields:
             field_type = type(field)
             if field_type in related_types:
                 related_model = get_related_model(field)
                 if related_model in api_handlers:
-                    related_types[field_type].append(
-                        (field_name, related_model)
-                    )
+                    related_types[field_type].append(field_name)
 
-        _model_field_names_cache[model] = (
-            dict(local, __unicode__=None), dict(single), dict(multiple)
-        )
+        _model_field_names_cache[model] = (local, single, multiple)
 
     return _model_field_names_cache[model]
 
@@ -474,7 +473,7 @@ class SpineAPI(View):
             multple: "has many" relations
         """
         if not hasattr(cls, '_serialize_fields_cache'):
-            all_fields = [fs.keys() for fs in get_field_names(cls.model)]
+            all_fields = get_field_names(cls.model)
             all_fields = select_fields(all_fields, cls.serialize_fields)
             cls._serialize_fields_cache = all_fields
 
