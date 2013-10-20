@@ -291,6 +291,7 @@ class Spine?.DropdownController extends Spine.Controller
 class Spine?.ListController extends Spine.Controller
     item_controllers: {}
     default_query: -> {}
+    container: -> @el
 
     constructor: ->
         super
@@ -304,8 +305,9 @@ class Spine?.ListController extends Spine.Controller
 
     add: (instance) =>
         item = @get_item instance
-        @el.append item.render()
-        @items.push item
+        if item not in @items
+            @container().append item.render()
+            @items.push item
 
     release_item: (item) =>
         @items = _.reject @items, (contained) -> contained is item

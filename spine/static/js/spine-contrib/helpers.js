@@ -457,6 +457,10 @@
         return {};
       };
 
+      ListController.prototype.container = function() {
+        return this.el;
+      };
+
       function ListController() {
         this.release_item = __bind(this.release_item, this);
         this.add = __bind(this.add, this);
@@ -486,8 +490,10 @@
       ListController.prototype.add = function(instance) {
         var item;
         item = this.get_item(instance);
-        this.el.append(item.render());
-        return this.items.push(item);
+        if (__indexOf.call(this.items, item) < 0) {
+          this.container().append(item.render());
+          return this.items.push(item);
+        }
       };
 
       ListController.prototype.release_item = function(item) {
