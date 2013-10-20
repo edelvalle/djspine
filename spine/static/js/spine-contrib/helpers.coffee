@@ -286,3 +286,38 @@ class Spine?.DropdownController extends Spine.Controller
         children = @children.toArray()
         children.push @el[0]
         children
+
+
+class Spine?.ListController extends Spine.Controller
+    item_controllers: {}
+    default_query: -> {}
+
+    constructor: ->
+        super
+        @items = []
+        for Model in (eval name for name of @item_controllers)
+            Model.bind 'refresh', @add_all
+            Model.fetch $.query @default_query()
+
+    add_all: (instances) =>
+        _.each instances, @add
+
+    add: (instance) =>
+        item = @get_item instance
+        @el.append item.render()
+        @items.push item
+
+    release_item: (item) =>
+        @items = _.reject @items, (contained) -> contained is item
+
+    get_item: (instance) ->
+        item = _.find @items, (item) -> item.instance.eql instance
+        if item?
+            item.instance = _.extend item.instance, instance
+            item.instance.trigger 'update'
+        else
+            ItemController = _.find @item_controllers, (controller, name) ->
+                 instance.constructor.className is _.last name.split '.'
+            item = new ItemController instance: instance
+            item.bind 'release', @release_item
+        item

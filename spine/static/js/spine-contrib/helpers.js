@@ -75,6 +75,8 @@
     Spine.FormController = (function(_super) {
       __extends(FormController, _super);
 
+      FormController.prototype.Model = null;
+
       FormController.prototype.elements = {
         '[name]': 'fields',
         '.control-group': 'control_groups'
@@ -327,6 +329,8 @@
     Spine.ModalController = (function(_super) {
       __extends(ModalController, _super);
 
+      ModalController.prototype.BodyController = null;
+
       ModalController.prototype.elements = {
         '.title': 'title',
         '.modal-body': 'body',
@@ -439,6 +443,80 @@
       };
 
       return DropdownController;
+
+    })(Spine.Controller);
+  };
+
+    if (typeof Spine !== "undefined" && Spine !== null) {
+    Spine.ListController = (function(_super) {
+      __extends(ListController, _super);
+
+      ListController.prototype.item_controllers = {};
+
+      ListController.prototype.default_query = function() {
+        return {};
+      };
+
+      function ListController() {
+        this.release_item = __bind(this.release_item, this);
+        this.add = __bind(this.add, this);
+        this.add_all = __bind(this.add_all, this);
+        var Model, name, _i, _len, _ref;
+        ListController.__super__.constructor.apply(this, arguments);
+        this.items = [];
+        _ref = (function() {
+          var _results;
+          _results = [];
+          for (name in this.item_controllers) {
+            _results.push(eval(name));
+          }
+          return _results;
+        }).call(this);
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          Model = _ref[_i];
+          Model.bind('refresh', this.add_all);
+          Model.fetch($.query(this.default_query()));
+        }
+      }
+
+      ListController.prototype.add_all = function(instances) {
+        return _.each(instances, this.add);
+      };
+
+      ListController.prototype.add = function(instance) {
+        var item;
+        item = this.get_item(instance);
+        this.el.append(item.render());
+        return this.items.push(item);
+      };
+
+      ListController.prototype.release_item = function(item) {
+        return this.items = _.reject(this.items, function(contained) {
+          return contained === item;
+        });
+      };
+
+      ListController.prototype.get_item = function(instance) {
+        var ItemController, item;
+        item = _.find(this.items, function(item) {
+          return item.instance.eql(instance);
+        });
+        if (item != null) {
+          item.instance = _.extend(item.instance, instance);
+          item.instance.trigger('update');
+        } else {
+          ItemController = _.find(this.item_controllers, function(controller, name) {
+            return instance.constructor.className === _.last(name.split('.'));
+          });
+          item = new ItemController({
+            instance: instance
+          });
+          item.bind('release', this.release_item);
+        }
+        return item;
+      };
+
+      return ListController;
 
     })(Spine.Controller);
   };
