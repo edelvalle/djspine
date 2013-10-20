@@ -190,7 +190,6 @@ class SpineAPI(View):
                 if field_name.endswith('_id') and cuted_field in relational:
                     field_name = cuted_field
                 data[field_name] = value
-            print data
             self._data = data
         return self._data
 

@@ -54,6 +54,8 @@ update = (old_instance, instance) ->
 
 
 class Spine?.FormController extends Spine.Controller
+    Model: null
+
     elements:
         '[name]': 'fields'
         '.control-group': 'control_groups'
@@ -168,6 +170,7 @@ class Spine?.FormController extends Spine.Controller
 ENTER = 13
 
 class Spine?.ItemController extends Spine.FormController
+
     elements:
         '[contenteditable]': 'fields'
         '[contenteditable]': 'control_groups'
@@ -216,6 +219,8 @@ class Spine?.ItemController extends Spine.FormController
 
 
 class Spine?.ModalController extends Spine.Controller
+    BodyController: null
+
     elements:
         '.title': 'title'
         '.modal-body': 'body'
