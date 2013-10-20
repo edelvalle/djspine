@@ -480,12 +480,19 @@ class SpineAPI(View):
         return cls._serialize_fields_cache
 
     @classmethod
-    def get_all_serialize_fields(cls):
+    def get_all_serialize_field_names(cls):
         local, single, multiple = cls.get_serialize_fields()
         return chain(local, single, multiple)
 
     @classmethod
+    def get_all_serialized_field_names_wih_ids(cls):
+        local, single, multiple = cls.get_serialize_fields()
+        single = [s + '_id' for s in single]
+        multiple = [s + '_ids' for s in multiple]
+        return chain(local, single, multiple)
+
+    @classmethod
     def get_form_fields(cls):
-        fields = cls.get_all_serialize_fields()
+        fields = cls.get_all_serialize_field_names()
         model_fields = cls.model._meta.get_all_field_names()
         return [f for f in fields if f in model_fields]

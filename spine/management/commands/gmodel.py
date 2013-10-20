@@ -41,7 +41,8 @@ class Command(BaseCommand):
     def __init__(self, *args, **kwargs):
         super(Command, self).__init__(*args, **kwargs)
         self.spine_model_template = loader.get_template(
-                self.spine_model_template_name)
+            self.spine_model_template_name
+        )
 
     # commands interface
 
@@ -96,7 +97,7 @@ def get_context(api_module):
     for api_class in get_api_classes(api_module):
         api_context = {
             'name': api_class.get_model_name(),
-            'fields': api_class.get_all_serialize_field_names(),
+            'fields': api_class.get_all_serialized_field_names_wih_ids(),
         }
         apis.append(api_context)
     return {'apis': apis}
