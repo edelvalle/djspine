@@ -84,10 +84,15 @@ String::unescape = -> _.unescape this
 
 # Spine
 
-csrfToken = $.getCookie 'csrftoken'
+csrf_token = $.getCookie 'csrftoken'
 $(document).ajaxSend (e, xhr, settings) ->
-    xhr.setRequestHeader 'X-CSRFToken', csrfToken
+    xhr.setRequestHeader 'X-CSRFToken', csrf_token
 
+$ ->
+    $loading = $ '#loading-img'
+    if $loading.length
+        $(document).ajaxStart -> $loading.fadeIn()
+        $(document).ajaxStop -> $loading.fadeOut 'fast'
 
 update = (old_instance, instance) ->
     instance = _.extend old_instance, instance
