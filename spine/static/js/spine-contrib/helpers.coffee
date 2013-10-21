@@ -357,7 +357,7 @@ class Spine?.ListController extends Spine.Controller
     get_item: (instance) ->
         item = @items.find (item) -> item.instance.eql instance
         if item?
-            item.instance = _.extend item.instance, instance
+            _.extend item.instance, instance
             item.instance.trigger 'update'
         else
             ItemController = _.find @item_controllers, (controller, name) ->

@@ -696,7 +696,7 @@
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           Model = _ref[_i];
           Model.bind('refresh', this.add_all);
-          Model.fetch($.query(this.default_query()));
+          Model.fetch($.query(this.default_query(Model)));
         }
       }
 
@@ -725,7 +725,7 @@
           return item.instance.eql(instance);
         });
         if (item != null) {
-          item.instance = _.extend(item.instance, instance);
+          _.extend(item.instance, instance);
           item.instance.trigger('update');
         } else {
           ItemController = _.find(this.item_controllers, function(controller, name) {
