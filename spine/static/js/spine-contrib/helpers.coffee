@@ -340,7 +340,7 @@ class Spine?.ListController extends Spine.Controller
         @items = []
         for Model in (eval name for name of @item_controllers)
             Model.bind 'refresh', @add_all
-            Model.fetch $.query @default_query()
+            Model.fetch $.query @default_query Model
 
     add_all: (instances) =>
         instances.each @add
