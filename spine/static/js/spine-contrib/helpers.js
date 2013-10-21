@@ -682,7 +682,7 @@
         this.release_item = __bind(this.release_item, this);
         this.add = __bind(this.add, this);
         this.add_all = __bind(this.add_all, this);
-        var Model, name, _i, _len, _ref;
+        var Model, name, query, _i, _len, _ref;
         ListController.__super__.constructor.apply(this, arguments);
         this.items = [];
         _ref = (function() {
@@ -695,8 +695,11 @@
         }).call(this);
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           Model = _ref[_i];
-          Model.bind('refresh', this.add_all);
-          Model.fetch($.query(this.default_query(Model)));
+          query = this.default_query(Model);
+          if (query != null) {
+            Model.bind('refresh', this.add_all);
+            Model.fetch($.query(query));
+          }
         }
       }
 
