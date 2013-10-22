@@ -147,9 +147,10 @@ class Spine?.FormController extends Spine.Controller
                 if (not 'errors' of error_data or
                     not 'instance' of error_data)
                         throw SyntaxError
-            catch SyntaxError
-                alert 'Error: there is a communication error!'
-                throw SyntaxError
+            catch error
+                if xhr.status isnt 200
+                    alert 'Error: there is a communication error!'
+                throw error
             return [error_data.instance, error_data.errors]
 
         [instance, errors] = parse_error_response xhr

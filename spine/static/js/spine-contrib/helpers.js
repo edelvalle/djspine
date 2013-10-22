@@ -369,16 +369,18 @@
         var errors, instance, parse_error_response, restore_instance_state, show_errors, _ref,
           _this = this;
         parse_error_response = function(xhr) {
-          var SyntaxError, error_data;
+          var error, error_data;
           try {
             error_data = JSON.parse(xhr.responseText);
             if (!'errors' in error_data || !'instance' in error_data) {
               throw SyntaxError;
             }
           } catch (_error) {
-            SyntaxError = _error;
-            alert('Error: there is a communication error!');
-            throw SyntaxError;
+            error = _error;
+            if (xhr.status !== 200) {
+              alert('Error: there is a communication error!');
+            }
+            throw error;
           }
           return [error_data.instance, error_data.errors];
         };
