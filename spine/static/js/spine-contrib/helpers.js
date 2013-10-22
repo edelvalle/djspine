@@ -730,9 +730,7 @@
       };
 
       ListController.prototype.release_item = function(item) {
-        return this.items = this.items.reject(function(this_item) {
-          return this_item.eql(item);
-        });
+        return this.items = this.items.without(item);
       };
 
       ListController.prototype.get_item = function(instance) {

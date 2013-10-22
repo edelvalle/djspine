@@ -359,7 +359,7 @@ class Spine?.ListController extends Spine.Controller
             @items.push item
 
     release_item: (item) =>
-        @items = @items.reject (this_item) -> this_item.eql item
+        @items = @items.without item
 
     get_item: (instance) ->
         item = @items.find (item) -> item.instance.eql instance
