@@ -114,6 +114,7 @@ class Spine?.FormController extends Spine.Controller
         field = @get_field name
         if value?
             field.val value
+            field.filter('img').attr 'src', value
         else
             field.val()
 
@@ -347,7 +348,7 @@ class Spine.EditionDropdown extends Spine.DropdownController
     focus_name: =>
         (@item.get_field @name_attr).focus()
 
-    remove_instances:(e) =>
+    remove_instances: =>
         all_selected = $.getSelectedElements '[data-model][data-id]'
         if all_selected.length and confirm 'Sure?'
             references = []

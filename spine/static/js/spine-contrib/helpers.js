@@ -320,7 +320,8 @@
         var field;
         field = this.get_field(name);
         if (value != null) {
-          return field.val(value);
+          field.val(value);
+          return field.filter('img').attr('src', value);
         } else {
           return field.val();
         }
@@ -700,7 +701,7 @@
       return (this.item.get_field(this.name_attr)).focus();
     };
 
-    EditionDropdown.prototype.remove_instances = function(e) {
+    EditionDropdown.prototype.remove_instances = function() {
       var Model, all_selected, id, references, selected, _i, _j, _len, _len1, _ref1, _results;
       all_selected = $.getSelectedElements('[data-model][data-id]');
       if (all_selected.length && confirm('Sure?')) {
