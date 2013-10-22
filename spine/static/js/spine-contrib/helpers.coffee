@@ -286,8 +286,8 @@ class Spine?.ModalController extends Spine.Controller
             parent: @
             el: @body
 
-    show: (title, options)=>
-        @title.html title if title?
+    show: (options)=>
+        @title.html title if options?.title?
         @body_controller.init_instance options
         @el.modal 'show'
 

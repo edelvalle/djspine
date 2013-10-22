@@ -589,8 +589,8 @@
         });
       }
 
-      ModalController.prototype.show = function(title, options) {
-        if (title != null) {
+      ModalController.prototype.show = function(options) {
+        if ((options != null ? options.title : void 0) != null) {
           this.title.html(title);
         }
         this.body_controller.init_instance(options);
