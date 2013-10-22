@@ -335,6 +335,56 @@ class Spine?.DropdownController extends Spine.Controller
         children
 
 
+class Spine.EditionDropdown extends Spine.DropdownController
+    events: _.extend(
+        _.clone Spine.DropdownController::events
+        'click .rename-action': 'focus_name'
+        'click .remove-action': 'remove_instances'
+    )
+    name_attr: 'name'
+
+    focus_name: =>
+        (@item.get_field @name_attr).focus()
+
+    remove_instances:(e) =>
+        all_selected = $.getSelectedElements '[data-model][data-id]'
+        if all_selected.length and confirm 'Sure?'
+            references = []
+            for selected in all_selected
+                references.push(
+                    [
+                        eval(selected.getAttribute 'data-model'),
+                        +selected.getAttribute 'data-id'
+                    ]
+                )
+            Model.destroy id for [Model, id] in references
+        else
+            @item.destroy_instance()
+
+
+class Spine.ItemWithContextualMenu extends Spine.ItemController
+    DropdownController: Spine.DropdownController
+
+    events: _.extend(
+        _.clone Spine.ItemController::events
+        'contextmenu .contextual-dropdown': 'show_dropdown'
+    )
+
+    elements: _.extend(
+        _.clone Spine.ItemController::elements
+        'ul.dropdown-menu': 'menu'
+    )
+
+    refreshElements: =>
+        super
+        @menu_controller?.release()
+        @menu_controller = new @DropdownController el: @menu, item: this
+
+    show_dropdown: (e) =>
+        e.preventDefault()
+        @menu_controller.show e
+
+
 class Spine?.ListController extends Spine.Controller
     item_controllers: {}
     default_query: -> {}
