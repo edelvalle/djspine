@@ -110,6 +110,9 @@ class SpineAPI(View):
     # Prefix for url with id
     pk_name = 'pk_'
 
+    # Manager methods allowed to use for queryset
+    manager_methods = ()
+
     # Methods allowed by the API View
     http_method_names = ('get', 'post', 'put', 'delete')
 
@@ -142,7 +145,7 @@ class SpineAPI(View):
     # is equivalent to:
     #
     #   @method_decorator(login_required)
-    #   def get(sefl, ...):
+    #   def get(self, ...):
     #      ....
     # or:
     #
@@ -160,7 +163,7 @@ class SpineAPI(View):
         Override this to return another query set
         Ex: self.model.objects.filter(user=self.request.user)
         """
-        return self.model.objects.all()
+        return self.model.objects
 
     @property
     def page_number(self):
@@ -176,9 +179,10 @@ class SpineAPI(View):
         if self._data is None:
             data = self._real_data
 
-            # Delete the page_param from the data
-            if self.page_param_name in data:
-                data.pop(self.page_param_name)
+            # Delete the page_param and manager_methods from the data
+            data.pop(self.page_param_name, None)
+            for manager_method_name in self.manager_methods:
+                data.pop(manager_method_name, None)
 
             # Extract the pks of related fields
             local, single, multiple = self.get_serialize_fields()
@@ -254,7 +258,14 @@ class SpineAPI(View):
         """
         Handle a GET request for a full collection (when no id was provided).
         """
-        return self.success_response(self.base_queryset.filter(**self.data))
+        method_name = 'filter'
+        for manager_method_name in self.manager_methods:
+            if manager_method_name in self._real_data:
+                method_name = manager_method_name
+                break
+        method = getattr(self.base_queryset, method_name)
+        queryset = method(**self.data)
+        return self.success_response(queryset)
 
     # POST & PUT requests
 
