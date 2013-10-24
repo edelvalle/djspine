@@ -691,7 +691,7 @@
       };
 
       ModalController.prototype.shown = function() {
-        return this.$('[name]:visible').focus();
+        return this.$('[type][name]:visible:first').focus();
       };
 
       ModalController.prototype.save = function() {

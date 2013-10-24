@@ -302,7 +302,7 @@ class Spine?.ModalController extends Spine.Controller
         @body_controller.init_instance force: true
 
     shown: =>
-        @$('[name]:visible').focus()
+        @$('[type][name]:visible:first').focus()
 
     save: =>
         @body_controller?.save?()
