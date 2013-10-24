@@ -95,9 +95,10 @@ $ ->
         $(document).ajaxStop -> $loading.fadeOut 'fast'
 
 update = (old_instance, instance) ->
-    instance = _.extend old_instance, instance
-    instance.trigger 'update'
-    instance
+    for attr, value of instance.attributes()
+        old_instance[attr] = value
+    old_instance.trigger 'update'
+    old_instance
 
 
 class Spine?.FormController extends Spine.Controller
@@ -416,8 +417,7 @@ class Spine?.ListController extends Spine.Controller
     get_item: (instance) ->
         item = @items.find (item) -> item.instance.eql instance
         if item?
-            _.extend item.instance, instance
-            item.instance.trigger 'update'
+            update item.instance, instance
         else
             ItemController = _.find @item_controllers, (controller, name) ->
                  instance.constructor.className is _.last name.split '.'
