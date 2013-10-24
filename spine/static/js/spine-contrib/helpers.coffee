@@ -108,6 +108,9 @@ class Spine?.FormController extends Spine.Controller
         '[name]': 'fields'
         '.control-group': 'control_groups'
 
+    events:
+        'submit': 'submit'
+
     get_field: (name) ->
         @fields.filter "[name=#{name}]"
 
@@ -121,7 +124,6 @@ class Spine?.FormController extends Spine.Controller
 
     constructor: ->
         super
-        @el.submit @submit
         @init_instance()
 
     init_instance: (options) ->
