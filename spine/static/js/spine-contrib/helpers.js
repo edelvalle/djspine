@@ -370,9 +370,14 @@
   });
 
   update = function(old_instance, instance) {
-    instance = _.extend(old_instance, instance);
-    instance.trigger('update');
-    return instance;
+    var attr, value, _ref;
+    _ref = instance.attributes();
+    for (attr in _ref) {
+      value = _ref[attr];
+      old_instance[attr] = value;
+    }
+    old_instance.trigger('update');
+    return old_instance;
   };
 
     if (typeof Spine !== "undefined" && Spine !== null) {
@@ -384,6 +389,10 @@
       FormController.prototype.elements = {
         '[name]': 'fields',
         '.control-group': 'control_groups'
+      };
+
+      FormController.prototype.events = {
+        'submit': 'submit'
       };
 
       FormController.prototype.get_field = function(name) {
@@ -411,7 +420,6 @@
         this.hide_errors = __bind(this.hide_errors, this);
         this.show_errors = __bind(this.show_errors, this);
         FormController.__super__.constructor.apply(this, arguments);
-        this.el.submit(this.submit);
         this.init_instance();
       }
 
@@ -593,7 +601,7 @@
 
       ItemController.prototype.bind_instance = function() {
         ItemController.__super__.bind_instance.apply(this, arguments);
-        this.instance.bind('update', this.populate_fields);
+        this.instance.bind('update', this.render);
         return this.instance.bind('destroy', this.destroy);
       };
 
@@ -888,8 +896,9 @@
         item = this.get_item(instance);
         if (__indexOf.call(this.items, item) < 0) {
           this.container().append(item.render());
-          return this.items.push(item);
+          this.items.push(item);
         }
+        return item;
       };
 
       ListController.prototype.release_item = function(item) {
@@ -902,8 +911,7 @@
           return item.instance.eql(instance);
         });
         if (item != null) {
-          _.extend(item.instance, instance);
-          item.instance.trigger('update');
+          update(item.instance, instance);
         } else {
           ItemController = _.find(this.item_controllers, function(controller, name) {
             return instance.constructor.className === _.last(name.split('.'));

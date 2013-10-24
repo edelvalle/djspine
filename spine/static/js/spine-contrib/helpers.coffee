@@ -244,7 +244,7 @@ class Spine?.ItemController extends Spine.FormController
 
     bind_instance: =>
         super
-        @instance.bind 'update', @populate_fields
+        @instance.bind 'update', @render
         @instance.bind 'destroy', @destroy
 
     trigger_field_change: (e) =>
@@ -412,6 +412,7 @@ class Spine?.ListController extends Spine.Controller
         if item not in @items
             @container().append item.render()
             @items.push item
+        item
 
     release_item: (item) =>
         @items = @items.without item
