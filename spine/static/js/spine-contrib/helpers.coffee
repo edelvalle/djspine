@@ -401,18 +401,19 @@ class Spine?.ListController extends Spine.Controller
         for Model in (eval name for name of @item_controllers)
             query = @default_query Model
             if query?
-                Model.bind 'refresh', @add_all
+                Model.bind 'refresh', @add
                 Model.fetch $.query query
 
-    add_all: (instances) =>
-        instances.each @add
+    add: (instances) =>
+        instance_added = false
+        for instance in instances
+            item = @get_item instance
+            if item not in @items
+                @container().append item.render()
+                @items.push item
+                instance_added = true
+        instance_added
 
-    add: (instance) =>
-        item = @get_item instance
-        if item not in @items
-            @container().append item.render()
-            @items.push item
-        item
 
     release_item: (item) =>
         @items = @items.without item
@@ -427,3 +428,27 @@ class Spine?.ListController extends Spine.Controller
             item = new ItemController instance: instance
             item.bind 'release', @release_item
         item
+
+
+class Spine?.InfiniteListController extends Spine.ListController
+    ScrollingModel: null
+
+    constructor: ->
+        super
+        @page_number = 1
+
+    add: =>
+        instance_added = super
+        if instance_added
+            last_item = @items.last()
+            if last_item?.instance.constructor is @ScrollingModel
+                last_item.el.waypoint @load_more,
+                    continuous: false
+                    triggerOnce: true
+                    offset: 'bottom-in-view'
+
+    load_more: =>
+        @page_number += 1
+        query = @default_query @ScrollingModel
+        query.p = @page_number
+        @ScrollingModel.fetch $.query query

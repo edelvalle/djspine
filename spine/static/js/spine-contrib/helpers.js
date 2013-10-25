@@ -865,7 +865,6 @@
       function ListController() {
         this.release_item = __bind(this.release_item, this);
         this.add = __bind(this.add, this);
-        this.add_all = __bind(this.add_all, this);
         var Model, name, query, _i, _len, _ref2;
         ListController.__super__.constructor.apply(this, arguments);
         this.items = [];
@@ -881,24 +880,25 @@
           Model = _ref2[_i];
           query = this.default_query(Model);
           if (query != null) {
-            Model.bind('refresh', this.add_all);
+            Model.bind('refresh', this.add);
             Model.fetch($.query(query));
           }
         }
       }
 
-      ListController.prototype.add_all = function(instances) {
-        return instances.each(this.add);
-      };
-
-      ListController.prototype.add = function(instance) {
-        var item;
-        item = this.get_item(instance);
-        if (__indexOf.call(this.items, item) < 0) {
-          this.container().append(item.render());
-          this.items.push(item);
+      ListController.prototype.add = function(instances) {
+        var instance, instance_added, item, _i, _len;
+        instance_added = false;
+        for (_i = 0, _len = instances.length; _i < _len; _i++) {
+          instance = instances[_i];
+          item = this.get_item(instance);
+          if (__indexOf.call(this.items, item) < 0) {
+            this.container().append(item.render());
+            this.items.push(item);
+            instance_added = true;
+          }
         }
-        return item;
+        return instance_added;
       };
 
       ListController.prototype.release_item = function(item) {
@@ -927,6 +927,47 @@
       return ListController;
 
     })(Spine.Controller);
+  };
+
+    if (typeof Spine !== "undefined" && Spine !== null) {
+    Spine.InfiniteListController = (function(_super) {
+      __extends(InfiniteListController, _super);
+
+      InfiniteListController.prototype.ScrollingModel = null;
+
+      function InfiniteListController() {
+        this.load_more = __bind(this.load_more, this);
+        this.add = __bind(this.add, this);
+        InfiniteListController.__super__.constructor.apply(this, arguments);
+        this.page_number = 1;
+      }
+
+      InfiniteListController.prototype.add = function() {
+        var instance_added, last_item;
+        instance_added = InfiniteListController.__super__.add.apply(this, arguments);
+        if (instance_added) {
+          last_item = this.items.last();
+          if ((last_item != null ? last_item.instance.constructor : void 0) === this.ScrollingModel) {
+            return last_item.el.waypoint(this.load_more, {
+              continuous: false,
+              triggerOnce: true,
+              offset: 'bottom-in-view'
+            });
+          }
+        }
+      };
+
+      InfiniteListController.prototype.load_more = function() {
+        var query;
+        this.page_number += 1;
+        query = this.default_query(this.ScrollingModel);
+        query.p = this.page_number;
+        return this.ScrollingModel.fetch($.query(query));
+      };
+
+      return InfiniteListController;
+
+    })(Spine.ListController);
   };
 
 }).call(this);
