@@ -293,14 +293,14 @@ class Spine?.ModalController extends Spine.Controller
 
     show: (options)=>
         @title.html title if options?.title?
-        @body_controller.init_instance options
+        @body_controller.init_instance? options
         @el.modal 'show'
 
     hide: =>
         @el.modal 'hide'
 
     hidden: =>
-        @body_controller.init_instance force: true
+        @body_controller.init_instance? force: true
 
     shown: =>
         @$('[type][name]:visible:first').focus()

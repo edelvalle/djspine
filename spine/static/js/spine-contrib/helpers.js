@@ -668,15 +668,19 @@
         this.el.on('shown', this.shown);
         this.body_controller = new this.BodyController({
           parent: this,
-          el: this.body
+          el: this.body,
+          options: this.body_init
         });
       }
 
       ModalController.prototype.show = function(options) {
+        var _base37;
         if ((options != null ? options.title : void 0) != null) {
           this.title.html(title);
         }
-        this.body_controller.init_instance(options);
+        if (typeof (_base37 = this.body_controller).init_instance === "function") {
+          _base37.init_instance(options);
+        }
         return this.el.modal('show');
       };
 
@@ -685,9 +689,10 @@
       };
 
       ModalController.prototype.hidden = function() {
-        return this.body_controller.init_instance({
+        var _base37;
+        return typeof (_base37 = this.body_controller).init_instance === "function" ? _base37.init_instance({
           force: true
-        });
+        }) : void 0;
       };
 
       ModalController.prototype.shown = function() {
