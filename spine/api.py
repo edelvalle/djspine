@@ -199,7 +199,7 @@ class SpineAPI(View):
     @property
     def _real_data(self):
         content_type = self.request.META.get('CONTENT_TYPE') or ''
-        if content_type == 'application/json':
+        if content_type.startswith('application/json'):
             try:
                 data = self._decode_request()
             except ValueError:
