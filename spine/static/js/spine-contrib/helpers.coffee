@@ -289,6 +289,7 @@ class Spine?.ModalController extends Spine.Controller
         @body_controller = new @BodyController
             parent: @
             el: @body
+            options: @body_init
 
     show: (options)=>
         @title.html title if options?.title?
