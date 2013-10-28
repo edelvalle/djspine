@@ -352,18 +352,18 @@ class Spine.EditionDropdown extends Spine.DropdownController
     focus_name: =>
         (@item.get_field @name_attr).focus()
 
+    selected_references: =>
+        for selected in $.getSelectedElements '[data-model][data-id]'
+            {
+                model: selected.getAttribute 'data-model'
+                id: +selected.getAttribute 'data-id'
+            }
+
     remove_instances: =>
-        all_selected = $.getSelectedElements '[data-model][data-id]'
-        if all_selected.length and confirm 'Sure?'
-            references = []
-            for selected in all_selected
-                references.push(
-                    [
-                        eval(selected.getAttribute 'data-model'),
-                        +selected.getAttribute 'data-id'
-                    ]
-                )
-            Model.destroy id for [Model, id] in references
+        references = @selected_references()
+        if references.length and confirm gettext 'Are you sure?'
+            for reference in references
+                eval(reference.model).destroy reference.id
         else
             @item.destroy_instance()
 
@@ -409,7 +409,7 @@ class Spine?.ListController extends Spine.Controller
         instance_added = false
         for instance in instances
             item = @get_item instance
-            if item not in @items
+            if item and item not in @items
                 @container().append item.render()
                 @items.push item
                 instance_added = true
@@ -425,7 +425,7 @@ class Spine?.ListController extends Spine.Controller
             update item.instance, instance
         else
             ItemController = _.find @item_controllers, (controller, name) ->
-                 instance.constructor.className is _.last name.split '.'
+                 instance.constructor.className is name
             item = new ItemController instance: instance
             item.bind 'release', @release_item
         item

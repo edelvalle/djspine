@@ -772,6 +772,7 @@
 
     function EditionDropdown() {
       this.remove_instances = __bind(this.remove_instances, this);
+      this.selected_references = __bind(this.selected_references, this);
       this.focus_name = __bind(this.focus_name, this);
       _ref = EditionDropdown.__super__.constructor.apply(this, arguments);
       return _ref;
@@ -788,19 +789,28 @@
       return (this.item.get_field(this.name_attr)).focus();
     };
 
+    EditionDropdown.prototype.selected_references = function() {
+      var selected, _i, _len, _ref1, _results;
+      _ref1 = $.getSelectedElements('[data-model][data-id]');
+      _results = [];
+      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+        selected = _ref1[_i];
+        _results.push({
+          model: selected.getAttribute('data-model'),
+          id: +selected.getAttribute('data-id')
+        });
+      }
+      return _results;
+    };
+
     EditionDropdown.prototype.remove_instances = function() {
-      var Model, all_selected, id, references, selected, _i, _j, _len, _len1, _ref1, _results;
-      all_selected = $.getSelectedElements('[data-model][data-id]');
-      if (all_selected.length && confirm('Sure?')) {
-        references = [];
-        for (_i = 0, _len = all_selected.length; _i < _len; _i++) {
-          selected = all_selected[_i];
-          references.push([eval(selected.getAttribute('data-model')), +selected.getAttribute('data-id')]);
-        }
+      var reference, references, _i, _len, _results;
+      references = this.selected_references();
+      if (references.length && confirm(gettext('Are you sure?'))) {
         _results = [];
-        for (_j = 0, _len1 = references.length; _j < _len1; _j++) {
-          _ref1 = references[_j], Model = _ref1[0], id = _ref1[1];
-          _results.push(Model.destroy(id));
+        for (_i = 0, _len = references.length; _i < _len; _i++) {
+          reference = references[_i];
+          _results.push(eval(reference.model).destroy(reference.id));
         }
         return _results;
       } else {
@@ -897,7 +907,7 @@
         for (_i = 0, _len = instances.length; _i < _len; _i++) {
           instance = instances[_i];
           item = this.get_item(instance);
-          if (__indexOf.call(this.items, item) < 0) {
+          if (item && __indexOf.call(this.items, item) < 0) {
             this.container().append(item.render());
             this.items.push(item);
             instance_added = true;
@@ -919,7 +929,7 @@
           update(item.instance, instance);
         } else {
           ItemController = _.find(this.item_controllers, function(controller, name) {
-            return instance.constructor.className === _.last(name.split('.'));
+            return instance.constructor.className === name;
           });
           item = new ItemController({
             instance: instance
