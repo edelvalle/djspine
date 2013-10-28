@@ -255,7 +255,7 @@ class Spine?.ItemController extends Spine.FormController
             $(e.target).trigger 'change'
 
     destroy_instance: =>
-        @instance.destroy() if confirm 'Sure?'
+        @instance.destroy() if confirm gettext 'Are you sure?'
 
     destroy: =>
         @el.fadeOut 'fast', @release

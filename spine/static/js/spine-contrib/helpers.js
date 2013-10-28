@@ -615,7 +615,7 @@
       };
 
       ItemController.prototype.destroy_instance = function() {
-        if (confirm('Sure?')) {
+        if (confirm(gettext('Are you sure?'))) {
           return this.instance.destroy();
         }
       };
