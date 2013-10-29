@@ -932,7 +932,7 @@
       ListController.prototype.get_item = function(instance) {
         var ItemController, item;
         item = this.items.find(function(item) {
-          return item.instance.eql(instance);
+          return instance.constructor === item.instance.constructor && ((instance.cid === item.instance.cid) || (instance.id && instance.id === item.instance.id));
         });
         if (item != null) {
           update(item.instance, instance);

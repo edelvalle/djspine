@@ -424,7 +424,12 @@ class Spine?.ListController extends Spine.Controller
         @items = @items.without item
 
     get_item: (instance) ->
-        item = @items.find (item) -> item.instance.eql instance
+        item = @items.find (item) ->
+            instance.constructor is item.instance.constructor and (
+                (instance.cid is item.instance.cid) or
+                (instance.id and instance.id is item.instance.id)
+            )
+
         if item?
             update item.instance, instance
         else
