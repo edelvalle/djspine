@@ -95,7 +95,7 @@ $ ->
         $(document).ajaxStop -> $loading.fadeOut 'fast'
 
 update = (old_instance, instance) ->
-    for attr, value of instance.attributes()
+    for attr, value of instance.attributes?() or instance
         old_instance[attr] = value
     old_instance.trigger 'update'
     old_instance
