@@ -332,7 +332,8 @@ class Spine?.DropdownController extends Spine.Controller
         to_element = e?.toElement
         @hide() if to_element not in @all_elements()
 
-    hide: =>
+    hide: (e) =>
+        e?.preventDefault()
         @el.slideUp 'fast'
 
     all_elements: ->
@@ -349,17 +350,20 @@ class Spine.EditionDropdown extends Spine.DropdownController
     )
     name_attr: 'name'
 
-    focus_name: =>
+    focus_name: (e) =>
+        e?.preventDefault()
         (@item.get_field @name_attr).focus()
 
     selected_references: =>
+
         for selected in $.getSelectedElements '[data-model][data-id]'
             {
                 model: selected.getAttribute 'data-model'
                 id: +selected.getAttribute 'data-id'
             }
 
-    remove_instances: =>
+    remove_instances: (e) =>
+        e?.preventDefault()
         references = @selected_references()
         if references.length and confirm gettext 'Are you sure?'
             for reference in references

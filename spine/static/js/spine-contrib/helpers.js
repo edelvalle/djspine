@@ -371,7 +371,7 @@
 
   update = function(old_instance, instance) {
     var attr, value, _ref;
-    _ref = instance.attributes();
+    _ref = (typeof instance.attributes === "function" ? instance.attributes() : void 0) || instance;
     for (attr in _ref) {
       value = _ref[attr];
       old_instance[attr] = value;
@@ -751,7 +751,10 @@
         }
       };
 
-      DropdownController.prototype.hide = function() {
+      DropdownController.prototype.hide = function(e) {
+        if (e != null) {
+          e.preventDefault();
+        }
         return this.el.slideUp('fast');
       };
 
@@ -785,7 +788,10 @@
 
     EditionDropdown.prototype.name_attr = 'name';
 
-    EditionDropdown.prototype.focus_name = function() {
+    EditionDropdown.prototype.focus_name = function(e) {
+      if (e != null) {
+        e.preventDefault();
+      }
       return (this.item.get_field(this.name_attr)).focus();
     };
 
@@ -803,8 +809,11 @@
       return _results;
     };
 
-    EditionDropdown.prototype.remove_instances = function() {
+    EditionDropdown.prototype.remove_instances = function(e) {
       var reference, references, _i, _len, _results;
+      if (e != null) {
+        e.preventDefault();
+      }
       references = this.selected_references();
       if (references.length && confirm(gettext('Are you sure?'))) {
         _results = [];
