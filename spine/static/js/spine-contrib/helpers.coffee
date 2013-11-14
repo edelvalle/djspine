@@ -94,7 +94,7 @@ $ ->
         $(document).ajaxStart -> $loading.fadeIn()
         $(document).ajaxStop -> $loading.fadeOut 'fast'
 
-update = (old_instance, instance) ->
+Spine.Model.updateInstance = (old_instance, instance) ->
     for attr, value of instance.attributes?() or instance
         old_instance[attr] = value
     old_instance.trigger 'update'
@@ -162,7 +162,7 @@ class Spine?.FormController extends Spine.Controller
         do restore_instance_state = =>
             if @instance.cid is @instance.id
                 @instance.id = null
-            @instance = update @instance, instance
+            @instance = Spine.Model.updateInstance @instance, instance
 
         do show_errors = =>
             if errors.__all__?
@@ -215,7 +215,7 @@ class Spine?.FormController extends Spine.Controller
 
     on_saved: (old_instance, new_instance) =>
         @reset_form()
-        @instance = update @instance, new_instance
+        @instance = Spine.Model.updateInstance @instance, new_instance
         @unbind_instance()
         @parent?.hide?()
 
@@ -425,7 +425,7 @@ class Spine?.ListController extends Spine.Controller
             )
 
         if item?
-            update item.instance, instance
+            Spine.Model.updateInstance item.instance, instance
         else
             ItemController = _.find @item_controllers, (controller, name) ->
                  instance.constructor.className is name
