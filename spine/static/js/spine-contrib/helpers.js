@@ -719,20 +719,14 @@
     Spine.DropdownController = (function(_super) {
       __extends(DropdownController, _super);
 
-      DropdownController.prototype.events = {
-        'click li': 'hide'
-      };
-
-      DropdownController.prototype.elements = {
-        '*': 'children'
-      };
+      DropdownController.prototype.is_open = false;
 
       function DropdownController() {
         this.hide = __bind(this.hide, this);
-        this.mouseout = __bind(this.mouseout, this);
+        this.window_clicked = __bind(this.window_clicked, this);
         this.show = __bind(this.show, this);
         DropdownController.__super__.constructor.apply(this, arguments);
-        this.el.bind('mouseout', this.mouseout);
+        $(window).bind('click', this.hide);
       }
 
       DropdownController.prototype.show = function(e) {
@@ -746,29 +740,19 @@
             });
           })();
         }
-        return this.el.slideDown('fast');
+        this.el.slideDown('fast');
+        return this.is_open = true;
       };
 
-      DropdownController.prototype.mouseout = function(e) {
-        var to_element;
-        to_element = e != null ? e.toElement : void 0;
-        if (__indexOf.call(this.all_elements(), to_element) < 0) {
-          return this.hide();
+      DropdownController.prototype.window_clicked = function(e) {
+        return this.hide();
+      };
+
+      DropdownController.prototype.hide = function() {
+        if (this.is_open) {
+          this.el.slideUp('fast');
+          return this.is_open = false;
         }
-      };
-
-      DropdownController.prototype.hide = function(e) {
-        if (e != null) {
-          e.preventDefault();
-        }
-        return this.el.slideUp('fast');
-      };
-
-      DropdownController.prototype.all_elements = function() {
-        var children;
-        children = this.children.toArray();
-        children.push(this.el[0]);
-        return children;
       };
 
       return DropdownController;
@@ -787,10 +771,10 @@
       return _ref;
     }
 
-    EditionDropdown.prototype.events = _.extend(_.clone(Spine.DropdownController.prototype.events), {
+    EditionDropdown.prototype.events = {
       'click .rename-action': 'focus_name',
       'click .remove-action': 'remove_instances'
-    });
+    };
 
     EditionDropdown.prototype.name_attr = 'name';
 

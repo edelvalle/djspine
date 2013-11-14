@@ -314,15 +314,11 @@ class Spine?.ModalController extends Spine.Controller
 
 
 class Spine?.DropdownController extends Spine.Controller
-    events:
-        'click li': 'hide'
-
-    elements:
-        '*': 'children'
+    is_open: false
 
     constructor: ->
         super
-        @el.bind 'mouseout', @mouseout
+        $(window).bind 'click', @hide
 
     show: (e) =>
         if e?.pageX? and e.pageY
@@ -331,27 +327,22 @@ class Spine?.DropdownController extends Spine.Controller
                     left: e.pageX - 10
                     top: e.pageY - 17
         @el.slideDown 'fast'
+        @is_open = true
 
-    mouseout: (e) =>
-        to_element = e?.toElement
-        @hide() if to_element not in @all_elements()
+    window_clicked: (e) =>
+        @hide()
 
-    hide: (e) =>
-        e?.preventDefault()
-        @el.slideUp 'fast'
-
-    all_elements: ->
-        children = @children.toArray()
-        children.push @el[0]
-        children
+    hide: =>
+        if @is_open
+            @el.slideUp 'fast'
+            @is_open = false
 
 
 class Spine.EditionDropdown extends Spine.DropdownController
-    events: _.extend(
-        _.clone Spine.DropdownController::events
+    events:
         'click .rename-action': 'focus_name'
         'click .remove-action': 'remove_instances'
-    )
+
     name_attr: 'name'
 
     focus_name: (e) =>
@@ -359,7 +350,6 @@ class Spine.EditionDropdown extends Spine.DropdownController
         (@item.get_field @name_attr).focus()
 
     selected_references: =>
-
         for selected in $.getSelectedElements '[data-model][data-id]'
             {
                 model: selected.getAttribute 'data-model'
