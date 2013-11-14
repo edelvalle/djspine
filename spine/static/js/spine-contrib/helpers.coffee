@@ -5,7 +5,7 @@ $.query = (query_data) ->
 
 
 $.fn.htmlTemplate = (args...) ->
-    @html().trim().template args...
+    @html()?.trim()?.template args...
 
 $.getSelectedElements = (selector) ->
     selection = window.getSelection()

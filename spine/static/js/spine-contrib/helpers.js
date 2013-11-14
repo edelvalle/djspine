@@ -15,9 +15,9 @@
   };
 
   $.fn.htmlTemplate = function() {
-    var args, _ref;
+    var args, _ref, _ref1;
     args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    return (_ref = this.html().trim()).template.apply(_ref, args);
+    return (_ref = this.html()) != null ? (_ref1 = _ref.trim()) != null ? _ref1.template.apply(_ref1, args) : void 0 : void 0;
   };
 
   $.getSelectedElements = function(selector) {
