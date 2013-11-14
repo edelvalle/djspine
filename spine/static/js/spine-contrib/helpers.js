@@ -582,6 +582,7 @@
         this.unbind_instance = __bind(this.unbind_instance, this);
         this.reset_form = __bind(this.reset_form, this);
         this.render = __bind(this.render, this);
+        this.render_on_update = __bind(this.render_on_update, this);
         this.destroy = __bind(this.destroy, this);
         this.destroy_instance = __bind(this.destroy_instance, this);
         this.trigger_field_change = __bind(this.trigger_field_change, this);
@@ -601,7 +602,7 @@
 
       ItemController.prototype.bind_instance = function() {
         ItemController.__super__.bind_instance.apply(this, arguments);
-        this.instance.bind('update', this.render);
+        this.instance.bind('update', this.render_on_update);
         return this.instance.bind('destroy', this.destroy);
       };
 
@@ -622,6 +623,11 @@
 
       ItemController.prototype.destroy = function() {
         return this.el.fadeOut('fast', this.release);
+      };
+
+      ItemController.prototype.render_on_update = function() {
+        this.render();
+        return getSelection().removeAllRanges();
       };
 
       ItemController.prototype.render = function() {
@@ -960,10 +966,12 @@
       InfiniteListController.prototype.ScrollingModel = null;
 
       function InfiniteListController() {
+        this.activate_infinite_loading = __bind(this.activate_infinite_loading, this);
         this.load_more = __bind(this.load_more, this);
         this.add = __bind(this.add, this);
         InfiniteListController.__super__.constructor.apply(this, arguments);
         this.page_number = 1;
+        this.infinite_load = false;
       }
 
       InfiniteListController.prototype.add = function() {
@@ -972,11 +980,15 @@
         if (instance_added) {
           last_item = this.items.last();
           if ((last_item != null ? last_item.instance.constructor : void 0) === this.ScrollingModel) {
-            return last_item.el.waypoint(this.load_more, {
-              continuous: false,
-              triggerOnce: true,
-              offset: 'bottom-in-view'
-            });
+            if (this.infinite_load) {
+              return this.load_more();
+            } else {
+              return last_item.el.waypoint(this.load_more, {
+                continuous: false,
+                triggerOnce: true,
+                offset: 'bottom-in-view'
+              });
+            }
           }
         }
       };
@@ -987,6 +999,11 @@
         query = this.default_query(this.ScrollingModel);
         query.p = this.page_number;
         return this.ScrollingModel.fetch($.query(query));
+      };
+
+      InfiniteListController.prototype.activate_infinite_loading = function() {
+        this.infinite_load = true;
+        return this.load_more();
       };
 
       return InfiniteListController;

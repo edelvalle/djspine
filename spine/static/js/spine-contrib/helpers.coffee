@@ -215,7 +215,7 @@ class Spine?.FormController extends Spine.Controller
 
     on_saved: (old_instance, new_instance) =>
         @reset_form()
-        @instance= update @instance, new_instance
+        @instance = update @instance, new_instance
         @unbind_instance()
         @parent?.hide?()
 
@@ -244,7 +244,7 @@ class Spine?.ItemController extends Spine.FormController
 
     bind_instance: =>
         super
-        @instance.bind 'update', @render
+        @instance.bind 'update', @render_on_update
         @instance.bind 'destroy', @destroy
 
     trigger_field_change: (e) =>
@@ -259,6 +259,10 @@ class Spine?.ItemController extends Spine.FormController
 
     destroy: =>
         @el.fadeOut 'fast', @release
+
+    render_on_update: =>
+        @render()
+        getSelection().removeAllRanges()
 
     render: =>
         @replace @template @instance
@@ -446,19 +450,27 @@ class Spine?.InfiniteListController extends Spine.ListController
     constructor: ->
         super
         @page_number = 1
+        @infinite_load = false
 
     add: =>
         instance_added = super
         if instance_added
             last_item = @items.last()
             if last_item?.instance.constructor is @ScrollingModel
-                last_item.el.waypoint @load_more,
-                    continuous: false
-                    triggerOnce: true
-                    offset: 'bottom-in-view'
+                if @infinite_load
+                    @load_more()
+                else
+                    last_item.el.waypoint @load_more,
+                        continuous: false
+                        triggerOnce: true
+                        offset: 'bottom-in-view'
 
     load_more: =>
         @page_number += 1
         query = @default_query @ScrollingModel
         query.p = @page_number
         @ScrollingModel.fetch $.query query
+
+    activate_infinite_loading: =>
+        @infinite_load = true
+        @load_more()
