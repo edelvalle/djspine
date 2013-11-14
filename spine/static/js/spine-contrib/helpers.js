@@ -735,8 +735,8 @@
         if (((e != null ? e.pageX : void 0) != null) && e.pageY) {
           (positionate_under_the_mouse = function() {
             return _this.el.css({
-              left: e.pageX - 10,
-              top: e.pageY - 17
+              left: e.pageX,
+              top: e.pageY
             });
           })();
         }

@@ -324,8 +324,8 @@ class Spine?.DropdownController extends Spine.Controller
         if e?.pageX? and e.pageY
             do positionate_under_the_mouse = =>
                 @el.css
-                    left: e.pageX - 10
-                    top: e.pageY - 17
+                    left: e.pageX
+                    top: e.pageY
         @el.slideDown 'fast'
         @is_open = true
 
