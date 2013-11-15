@@ -313,29 +313,38 @@ class Spine?.ModalController extends Spine.Controller
         @body_controller?.save?()
 
 
+RIGHT_MOUSE_BUTTON = 3
+
 class Spine?.DropdownController extends Spine.Controller
+    @open: null
     is_open: false
 
     constructor: ->
         super
-        $(window).bind 'click', @hide
+        $(window).bind 'click', @window_clicked
+        $(window).bind 'contextmenu', @window_clicked
 
     show: (e) =>
-        if e?.pageX? and e.pageY
+        if e?.pageX? and e?.pageY?
             do positionate_under_the_mouse = =>
                 @el.css
                     left: e.pageX
                     top: e.pageY
         @el.slideDown 'fast'
         @is_open = true
+        Spine.DropdownController.open = this
 
     window_clicked: (e) =>
-        @hide()
+        @hide() if e.which isnt RIGHT_MOUSE_BUTTON or
+            e.which is RIGHT_MOUSE_BUTTON and
+            Spine.DropdownController.open isnt this
 
     hide: =>
         if @is_open
             @el.slideUp 'fast'
             @is_open = false
+            if Spine.DropdownController.open is this
+                Spine.DropdownController.open = null
 
 
 class Spine.EditionDropdown extends Spine.DropdownController
