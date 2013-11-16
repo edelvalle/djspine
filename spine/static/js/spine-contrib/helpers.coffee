@@ -355,7 +355,7 @@ class Spine?.EditionDropdown extends Spine.DropdownController
         (@item.get_field @name_attr).focus()
 
     selected_references: =>
-        for selected in $.getSelectedElements '[data-model][data-id]'
+        for selected in $('.ui-selected[data-model][data-id]')
             {
                 model: selected.getAttribute 'data-model'
                 id: +selected.getAttribute 'data-id'

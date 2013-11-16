@@ -799,7 +799,7 @@
 
       EditionDropdown.prototype.selected_references = function() {
         var selected, _i, _len, _ref2, _results;
-        _ref2 = $.getSelectedElements('[data-model][data-id]');
+        _ref2 = $('.ui-selected[data-model][data-id]');
         _results = [];
         for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
           selected = _ref2[_i];
