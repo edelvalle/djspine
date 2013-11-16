@@ -410,14 +410,14 @@ class Spine?.ListController extends Spine.Controller
                 Model.fetch $.query query
 
     add: (instances) =>
-        items_added = []
+        added_items = []
         for instance in instances
             item = @get_item instance
             if item and item not in @items
                 @container().append item.render()
                 @items.push item
-                items_added.push item
-        items_added
+                added_items.push item
+        added_items
 
     release_item: (item) =>
         @items = @items.without item
