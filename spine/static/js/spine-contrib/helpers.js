@@ -918,18 +918,18 @@
       }
 
       ListController.prototype.add = function(instances) {
-        var instance, instance_added, item, _i, _len;
-        instance_added = false;
+        var instance, item, items_added, _i, _len;
+        items_added = [];
         for (_i = 0, _len = instances.length; _i < _len; _i++) {
           instance = instances[_i];
           item = this.get_item(instance);
           if (item && __indexOf.call(this.items, item) < 0) {
             this.container().append(item.render());
             this.items.push(item);
-            instance_added = true;
+            items_added.push(item);
           }
         }
-        return instance_added;
+        return items_added;
       };
 
       ListController.prototype.release_item = function(item) {
@@ -976,22 +976,21 @@
       }
 
       InfiniteListController.prototype.add = function() {
-        var instance_added, last_item;
-        instance_added = InfiniteListController.__super__.add.apply(this, arguments);
-        if (instance_added) {
-          last_item = this.items.last();
-          if ((last_item != null ? last_item.instance.constructor : void 0) === this.ScrollingModel) {
-            if (this.infinite_load) {
-              return this.load_more();
-            } else {
-              return last_item.el.waypoint(this.load_more, {
-                continuous: false,
-                triggerOnce: true,
-                offset: 'bottom-in-view'
-              });
-            }
+        var items_added, last_item;
+        items_added = InfiniteListController.__super__.add.apply(this, arguments);
+        last_item = items_added.last();
+        if ((last_item != null ? last_item.instance.constructor : void 0) === this.ScrollingModel) {
+          if (this.infinite_load) {
+            this.load_more();
+          } else {
+            last_item.el.waypoint(this.load_more, {
+              continuous: false,
+              triggerOnce: true,
+              offset: 'bottom-in-view'
+            });
           }
         }
+        return items_added;
       };
 
       InfiniteListController.prototype.load_more = function() {

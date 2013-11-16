@@ -410,15 +410,14 @@ class Spine?.ListController extends Spine.Controller
                 Model.fetch $.query query
 
     add: (instances) =>
-        instance_added = false
+        items_added = []
         for instance in instances
             item = @get_item instance
             if item and item not in @items
                 @container().append item.render()
                 @items.push item
-                instance_added = true
-        instance_added
-
+                items_added.push item
+        items_added
 
     release_item: (item) =>
         @items = @items.without item
@@ -449,17 +448,17 @@ class Spine?.InfiniteListController extends Spine.ListController
         @infinite_load = false
 
     add: =>
-        instance_added = super
-        if instance_added
-            last_item = @items.last()
-            if last_item?.instance.constructor is @ScrollingModel
-                if @infinite_load
-                    @load_more()
-                else
-                    last_item.el.waypoint @load_more,
-                        continuous: false
-                        triggerOnce: true
-                        offset: 'bottom-in-view'
+        items_added = super
+        last_item = items_added.last()
+        if last_item?.instance.constructor is @ScrollingModel
+            if @infinite_load
+                @load_more()
+            else
+                last_item.el.waypoint @load_more,
+                    continuous: false
+                    triggerOnce: true
+                    offset: 'bottom-in-view'
+        items_added
 
     load_more: =>
         @page_number += 1
