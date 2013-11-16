@@ -317,12 +317,14 @@ RIGHT_MOUSE_BUTTON = 3
 
 class Spine?.DropdownController extends Spine.Controller
     @open: null
-    is_open: false
 
-    constructor: ->
-        super
-        $(window).bind 'click', @window_clicked
-        $(window).bind 'contextmenu', @window_clicked
+    @set_open: (menu) ->
+        menu.el.slideDown 'fast'
+        Spine.DropdownController.hide_open()
+        Spine.DropdownController.open = menu
+
+    @hide_open: (e) ->
+        Spine.DropdownController.open?.hide()
 
     show: (e) =>
         if e?.pageX? and e?.pageY?
@@ -330,24 +332,18 @@ class Spine?.DropdownController extends Spine.Controller
                 @el.css
                     left: e.pageX
                     top: e.pageY
-        @el.slideDown 'fast'
-        @is_open = true
-        Spine.DropdownController.open = this
-
-    window_clicked: (e) =>
-        @hide() if e.which isnt RIGHT_MOUSE_BUTTON or
-            e.which is RIGHT_MOUSE_BUTTON and
-            Spine.DropdownController.open isnt this
+        Spine.DropdownController.set_open this
 
     hide: =>
-        if @is_open
-            @el.slideUp 'fast'
-            @is_open = false
-            if Spine.DropdownController.open is this
-                Spine.DropdownController.open = null
+        @el.slideUp 'fast'
+        if Spine.DropdownController.open is this
+            Spine.DropdownController.open = null
+
+if Spine?.DropdownController?
+    $(window).bind 'click', Spine.DropdownController.hide_open
 
 
-class Spine.EditionDropdown extends Spine.DropdownController
+class Spine?.EditionDropdown extends Spine.DropdownController
     events:
         'click .rename-action': 'focus_name'
         'click .remove-action': 'remove_instances'
@@ -375,7 +371,7 @@ class Spine.EditionDropdown extends Spine.DropdownController
             @item.destroy_instance()
 
 
-class Spine.ItemWithContextualMenu extends Spine.ItemController
+class Spine?.ItemWithContextualMenu extends Spine.ItemController
     DropdownController: Spine.DropdownController
 
     events: _.extend(
