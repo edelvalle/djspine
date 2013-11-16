@@ -262,7 +262,7 @@ class Spine?.ItemController extends Spine.FormController
 
     render_on_update: =>
         @render()
-        getSelection().removeAllRanges()
+        window.getSelection().removeAllRanges()
 
     render: =>
         @replace @template @instance
