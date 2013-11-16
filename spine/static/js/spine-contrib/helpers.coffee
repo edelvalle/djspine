@@ -324,7 +324,8 @@ class Spine?.DropdownController extends Spine.Controller
         Spine.DropdownController.open = menu
 
     @hide_open: (e) ->
-        Spine.DropdownController.open?.hide()
+        Spine.DropdownController.open?.hide() if not e? or
+            e?.which isnt RIGHT_MOUSE_BUTTON
 
     show: (e) =>
         if e?.pageX? and e?.pageY?

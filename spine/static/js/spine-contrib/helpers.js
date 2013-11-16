@@ -627,7 +627,7 @@
 
       ItemController.prototype.render_on_update = function() {
         this.render();
-        return getSelection().removeAllRanges();
+        return window.getSelection().removeAllRanges();
       };
 
       ItemController.prototype.render = function() {
@@ -738,7 +738,9 @@
 
       DropdownController.hide_open = function(e) {
         var _ref1;
-        return (_ref1 = Spine.DropdownController.open) != null ? _ref1.hide() : void 0;
+        if ((e == null) || (e != null ? e.which : void 0) !== RIGHT_MOUSE_BUTTON) {
+          return (_ref1 = Spine.DropdownController.open) != null ? _ref1.hide() : void 0;
+        }
       };
 
       DropdownController.prototype.show = function(e) {
