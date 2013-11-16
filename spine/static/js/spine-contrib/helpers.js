@@ -918,18 +918,18 @@
       }
 
       ListController.prototype.add = function(instances) {
-        var instance, item, items_added, _i, _len;
-        items_added = [];
+        var added_items, instance, item, _i, _len;
+        added_items = [];
         for (_i = 0, _len = instances.length; _i < _len; _i++) {
           instance = instances[_i];
           item = this.get_item(instance);
           if (item && __indexOf.call(this.items, item) < 0) {
             this.container().append(item.render());
             this.items.push(item);
-            items_added.push(item);
+            added_items.push(item);
           }
         }
-        return items_added;
+        return added_items;
       };
 
       ListController.prototype.release_item = function(item) {
@@ -1009,6 +1009,62 @@
       return InfiniteListController;
 
     })(Spine.ListController);
+  };
+
+    if (typeof Spine !== "undefined" && Spine !== null) {
+    Spine.InfiniteGridController = (function(_super) {
+      __extends(InfiniteGridController, _super);
+
+      function InfiniteGridController() {
+        this.arrange = __bind(this.arrange, this);
+        this.release_item = __bind(this.release_item, this);
+        this.add = __bind(this.add, this);
+        InfiniteGridController.__super__.constructor.apply(this, arguments);
+        $(window).resize(this.arrange);
+      }
+
+      InfiniteGridController.prototype.add = function() {
+        var added_items, items, last_item;
+        last_item = this.items.last();
+        items = last_item ? [last_item] : [];
+        added_items = InfiniteGridController.__super__.add.apply(this, arguments);
+        items = items.concat(added_items);
+        this.arrange(items);
+        return added_items;
+      };
+
+      InfiniteGridController.prototype.release_item = function(item) {
+        var index;
+        index = this.items.indexOf(item);
+        this.arrange(this.items.slice(index + 1));
+        return InfiniteGridController.__super__.release_item.apply(this, arguments);
+      };
+
+      InfiniteGridController.prototype.arrange = function(items) {
+        var item, item_top, last_top, _i, _len, _results;
+        if (!_.isArray(items)) {
+          items = this.items;
+        }
+        if (items.length) {
+          last_top = items.first().el.offset().top;
+          _results = [];
+          for (_i = 0, _len = items.length; _i < _len; _i++) {
+            item = items[_i];
+            item.el.removeClass('first');
+            item_top = item.el.offset().top;
+            if (item_top !== last_top) {
+              item.el.addClass('first');
+              item_top = item.el.offset().top;
+            }
+            _results.push(last_top = item_top);
+          }
+          return _results;
+        }
+      };
+
+      return InfiniteGridController;
+
+    })(Spine.InfiniteListController);
   };
 
 }).call(this);

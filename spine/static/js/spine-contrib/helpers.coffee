@@ -469,3 +469,35 @@ class Spine?.InfiniteListController extends Spine.ListController
     activate_infinite_loading: =>
         @infinite_load = true
         @load_more()
+
+
+class Spine?.InfiniteGridController extends Spine.InfiniteListController
+
+    constructor: ->
+        super
+        $(window).resize @arrange
+
+    add: =>
+        last_item = @items.last()
+        items = if last_item then [last_item] else []
+        added_items = super
+        items = items.concat added_items
+        @arrange items
+        added_items
+
+    release_item: (item) =>
+        index = @items.indexOf item
+        @arrange @items[index + 1..]
+        super
+
+    arrange: (items) =>
+        items = @items if not _.isArray items
+        if items.length
+            last_top = items.first().el.offset().top
+            for item in items
+                item.el.removeClass 'first'
+                item_top = item.el.offset().top
+                if item_top isnt last_top
+                    item.el.addClass 'first'
+                    item_top = item.el.offset().top
+                last_top = item_top
