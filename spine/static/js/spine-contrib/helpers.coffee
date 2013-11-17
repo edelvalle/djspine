@@ -392,6 +392,9 @@ class Spine?.ItemWithContextualMenu extends Spine.ItemController
 
     show_dropdown: (e) =>
         e.preventDefault()
+        unless @el.hasClass 'ui-selected'
+            $('.ui-selected').removeClass 'ui-selected'
+            @el.addClass 'ui-selected'
         @menu_controller.show e
 
 

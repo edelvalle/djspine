@@ -871,6 +871,10 @@
 
       ItemWithContextualMenu.prototype.show_dropdown = function(e) {
         e.preventDefault();
+        if (!this.el.hasClass('ui-selected')) {
+          $('.ui-selected').removeClass('ui-selected');
+          this.el.addClass('ui-selected');
+        }
         return this.menu_controller.show(e);
       };
 
