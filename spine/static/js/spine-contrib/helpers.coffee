@@ -490,8 +490,8 @@ class Spine?.InfiniteGridController extends Spine.InfiniteListController
 
     release_item: (item) =>
         index = @items.indexOf item
-        @arrange @items[index + 1..]
         super
+        @arrange @items[index - 1..]
 
     arrange: (items) =>
         items = @items if not _.isArray items

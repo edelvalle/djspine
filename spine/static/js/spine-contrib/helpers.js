@@ -1040,8 +1040,8 @@
       InfiniteGridController.prototype.release_item = function(item) {
         var index;
         index = this.items.indexOf(item);
-        this.arrange(this.items.slice(index + 1));
-        return InfiniteGridController.__super__.release_item.apply(this, arguments);
+        InfiniteGridController.__super__.release_item.apply(this, arguments);
+        return this.arrange(this.items.slice(index - 1));
       };
 
       InfiniteGridController.prototype.arrange = function(items) {
