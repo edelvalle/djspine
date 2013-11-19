@@ -117,9 +117,11 @@ class Spine?.FormController extends Spine.Controller
 
     field_value: (name, value) ->
         field = @get_field name
-        if value?
+        if value? and field.length
             field.val value
             field.filter('img').attr 'src', value
+            field.filter('span').text String(value).escape()
+            field.trigger 'change'
         else
             field.val()
 
