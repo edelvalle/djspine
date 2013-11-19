@@ -103,6 +103,7 @@ Spine.Model.updateInstance = (old_instance, instance) ->
 
 class Spine?.FormController extends Spine.Controller
     Model: null
+    read_only = []
 
     elements:
         '[name]': 'fields'
@@ -198,10 +199,11 @@ class Spine?.FormController extends Spine.Controller
         for field in @fields
             $field = $ field
             name = $field.attr 'name'
-            value = @field_value name
-            if @instance[name] isnt value
-                @instance[name] = value
-                modified = true
+            if name not in @read_only
+                value = @field_value name
+                if @instance[name] isnt value
+                    @instance[name] = value
+                    modified = true
         modified
 
     submit: (e) =>
