@@ -27,7 +27,9 @@ import json
 from itertools import chain
 
 from xoutil.string import cut_suffix
+from dateutil.parser import parse as parse_date
 
+from django.db.models import DateField, TimeField, DateTimeField
 from django.db.models.query import QuerySet
 from django.db.models.fields import related
 from django.forms.models import modelform_factory
@@ -187,11 +189,21 @@ class SpineAPI(View):
             # Extract the pks of related fields
             local, single, multiple = self.get_serialize_fields()
             relational = list(chain(single, multiple))
+            date_fields = {
+                field.name
+                for field in self.model._meta.fields
+                if isinstance(field, (DateField, TimeField, DateTimeField))
+            }
 
             for field_name, value in data.items():
                 cuted_field = cut_suffix(field_name, '_id')
                 if field_name.endswith('_id') and cuted_field in relational:
                     field_name = cuted_field
+                # TODO: test the image viewer in the search view and
+                #   the properties too
+                field_base_name = field_name.split('__', 1)[0]
+                if field_base_name in date_fields:
+                    value = parse_date(value)
                 data[field_name] = value
             self._data = data
         return self._data
