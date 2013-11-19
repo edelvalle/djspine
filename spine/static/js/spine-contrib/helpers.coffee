@@ -111,6 +111,8 @@ class Spine?.FormController extends Spine.Controller
 
     events:
         'submit': 'submit'
+        'submit form': 'submit'
+        'keypress input': 'submit_on_enter'
 
     get_field: (name) ->
         @fields.filter "[name=#{name}]"
@@ -207,6 +209,9 @@ class Spine?.FormController extends Spine.Controller
                     @instance[name] = value
                     modified = true
         modified
+
+    submit_on_enter: (e) =>
+        @submit() if e.keyCode is ENTER
 
     submit: (e) =>
         e?.preventDefault?()

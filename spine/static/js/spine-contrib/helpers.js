@@ -382,9 +382,13 @@
 
     if (typeof Spine !== "undefined" && Spine !== null) {
     Spine.FormController = (function(_super) {
+      var read_only;
+
       __extends(FormController, _super);
 
       FormController.prototype.Model = null;
+
+      read_only = [];
 
       FormController.prototype.elements = {
         '[name]': 'fields',
@@ -392,7 +396,9 @@
       };
 
       FormController.prototype.events = {
-        'submit': 'submit'
+        'submit': 'submit',
+        'submit form': 'submit',
+        'keypress input': 'submit_on_enter'
       };
 
       FormController.prototype.get_field = function(name) {
@@ -402,9 +408,11 @@
       FormController.prototype.field_value = function(name, value) {
         var field;
         field = this.get_field(name);
-        if (value != null) {
+        if ((value != null) && field.length) {
           field.val(value);
-          return field.filter('img').attr('src', value);
+          field.filter('img').attr('src', value);
+          field.filter('span').text(String(value).escape());
+          return field.trigger('change');
         } else {
           return field.val();
         }
@@ -414,6 +422,7 @@
         this.on_saved = __bind(this.on_saved, this);
         this.save = __bind(this.save, this);
         this.submit = __bind(this.submit, this);
+        this.submit_on_enter = __bind(this.submit_on_enter, this);
         this.populate_instance = __bind(this.populate_instance, this);
         this.populate_fields = __bind(this.populate_fields, this);
         this.reset_form = __bind(this.reset_form, this);
@@ -523,13 +532,21 @@
           field = _ref[_i];
           $field = $(field);
           name = $field.attr('name');
-          value = this.field_value(name);
-          if (this.instance[name] !== value) {
-            this.instance[name] = value;
-            modified = true;
+          if (__indexOf.call(this.read_only, name) < 0) {
+            value = this.field_value(name);
+            if (this.instance[name] !== value) {
+              this.instance[name] = value;
+              modified = true;
+            }
           }
         }
         return modified;
+      };
+
+      FormController.prototype.submit_on_enter = function(e) {
+        if (e.keyCode === ENTER) {
+          return this.submit();
+        }
       };
 
       FormController.prototype.submit = function(e) {
