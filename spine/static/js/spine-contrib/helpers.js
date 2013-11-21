@@ -382,13 +382,11 @@
 
     if (typeof Spine !== "undefined" && Spine !== null) {
     Spine.FormController = (function(_super) {
-      var read_only;
-
       __extends(FormController, _super);
 
       FormController.prototype.Model = null;
 
-      read_only = [];
+      FormController.prototype.read_only = [];
 
       FormController.prototype.elements = {
         '[name]': 'fields',

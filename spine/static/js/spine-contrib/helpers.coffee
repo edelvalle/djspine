@@ -103,7 +103,7 @@ Spine.Model.updateInstance = (old_instance, instance) ->
 
 class Spine?.FormController extends Spine.Controller
     Model: null
-    read_only = []
+    read_only: []
 
     elements:
         '[name]': 'fields'
