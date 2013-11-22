@@ -24,6 +24,8 @@
 
 
 import sys
+from functools import wraps
+from django.http import HttpResponseForbidden
 
 
 def get_app_label(any_thing):
@@ -73,10 +75,10 @@ def get_api_classes(api_module):
     from .api import SpineAPI
     for attr_name in dir(api_module):
         attr = getattr(api_module, attr_name)
-        if (isinstance(attr, type)
-            and attr is not SpineAPI
-            and issubclass(attr, SpineAPI)
-            and attr.get_model_name()):
+        if (isinstance(attr, type) and
+                attr is not SpineAPI and
+                issubclass(attr, SpineAPI) and
+                attr.get_model_name()):
             yield attr
 
 
@@ -99,3 +101,22 @@ def select_fields(all_fields, suggested=None):
             suggested.difference_update(field_set)
         all_fields[0] = all_fields[0].union(suggested)
     return all_fields
+
+
+def check_permissions(*actions):
+    def decorator(method):
+        @wraps(method)
+        def wrapper(self, request, *args, **kwargs):
+            if self.permission_checking:
+                app = self.model._meta.app_label
+                model = self.model._meta.module_name
+                perms = [
+                    '{app}.{action}_{model}'.format(**locals())
+                    for action in actions
+                ]
+                print(perms)
+                if not request.user.has_perms(perms):
+                    return HttpResponseForbidden('Error 403: Forbidden')
+            return method(self, request, *args, **kwargs)
+        return wrapper
+    return decorator

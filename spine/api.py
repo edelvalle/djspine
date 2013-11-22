@@ -39,7 +39,7 @@ from django.views.generic import View
 from django.conf.urls import url
 
 from .utils import get_app_label, flatten_dict, get_related_model
-from .utils import select_fields
+from .utils import select_fields, check_permissions
 from .api_meta import SpineAPIMeta, api_handlers
 from .encoder import SpineJSONEncoder
 
@@ -155,6 +155,9 @@ class SpineAPI(View):
     #
     method_decorators = {}
 
+    # Checks the permissions for the get, post, put and delete request
+    permission_checking = True
+
     def __init__(self, *args, **kwargs):
         super(SpineAPI, self).__init__(*args, **kwargs)
         self._data = None
@@ -246,7 +249,7 @@ class SpineAPI(View):
     _get_data_for_put = _get_data_for_post
 
     # GET request
-
+    @check_permissions('change', 'delete')
     def get(self, request, id=None):
         """
         Handle GET requests, either for a single resource or a collection.
@@ -280,7 +283,7 @@ class SpineAPI(View):
         return self.success_response(queryset)
 
     # POST & PUT requests
-
+    @check_permissions('add')
     def post(self, request):
         """
         Handle a POST request by adding a new model instance.
@@ -297,6 +300,7 @@ class SpineAPI(View):
     def has_add_permissions(self, request):
         return True
 
+    @check_permissions('change')
     def put(self, request, id=None):
         """
         Handle a PUT request by editing an existing model.
@@ -357,7 +361,7 @@ class SpineAPI(View):
             return self.validation_error_response(item, errors)
 
     # Delete request
-
+    @check_permissions('delete')
     def delete(self, request, *args, **kwargs):
         """
         Respond to DELETE requests by deleting the model and returning its
