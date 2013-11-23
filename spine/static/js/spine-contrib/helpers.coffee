@@ -131,7 +131,7 @@ class Spine?.FormController extends Spine.Controller
         super
         @init_instance()
 
-    init_instance: (options) ->
+    init_instance: (options) =>
         @instance = options.instance if options?.instance?
         if options?.force
             @instance = new @Model
@@ -295,9 +295,8 @@ class Spine?.ModalController extends Spine.Controller
         'click .cancel': 'hide'
         'click .save': 'save'
 
-     constructor: ->
+    constructor: ->
         super
-        @el.on 'hidden', @hidden
         @el.on 'shown', @shown
         @body_controller = new @BodyController
             parent: @
@@ -306,14 +305,11 @@ class Spine?.ModalController extends Spine.Controller
 
     show: (options)=>
         @title.html title if options?.title?
-        @body_controller.init_instance? options
+        @body_controller?.init_instance? options
         @el.modal 'show'
 
     hide: =>
         @el.modal 'hide'
-
-    hidden: =>
-        @body_controller.init_instance? force: true
 
     shown: =>
         @$('[type][name]:visible:first').focus()

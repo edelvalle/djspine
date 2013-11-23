@@ -426,6 +426,7 @@
         this.reset_form = __bind(this.reset_form, this);
         this.hide_errors = __bind(this.hide_errors, this);
         this.show_errors = __bind(this.show_errors, this);
+        this.init_instance = __bind(this.init_instance, this);
         FormController.__super__.constructor.apply(this, arguments);
         this.init_instance();
       }
@@ -681,11 +682,9 @@
       function ModalController() {
         this.save = __bind(this.save, this);
         this.shown = __bind(this.shown, this);
-        this.hidden = __bind(this.hidden, this);
         this.hide = __bind(this.hide, this);
         this.show = __bind(this.show, this);
         ModalController.__super__.constructor.apply(this, arguments);
-        this.el.on('hidden', this.hidden);
         this.el.on('shown', this.shown);
         this.body_controller = new this.BodyController({
           parent: this,
@@ -695,25 +694,20 @@
       }
 
       ModalController.prototype.show = function(options) {
-        var _base37;
+        var _ref;
         if ((options != null ? options.title : void 0) != null) {
           this.title.html(title);
         }
-        if (typeof (_base37 = this.body_controller).init_instance === "function") {
-          _base37.init_instance(options);
+        if ((_ref = this.body_controller) != null) {
+          if (typeof _ref.init_instance === "function") {
+            _ref.init_instance(options);
+          }
         }
         return this.el.modal('show');
       };
 
       ModalController.prototype.hide = function() {
         return this.el.modal('hide');
-      };
-
-      ModalController.prototype.hidden = function() {
-        var _base37;
-        return typeof (_base37 = this.body_controller).init_instance === "function" ? _base37.init_instance({
-          force: true
-        }) : void 0;
       };
 
       ModalController.prototype.shown = function() {
