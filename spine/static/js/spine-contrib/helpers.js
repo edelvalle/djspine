@@ -989,13 +989,18 @@
       }
 
       InfiniteListController.prototype.add = function() {
-        var items_added, last_item;
+        var items_added, last_before_item, last_item;
         items_added = InfiniteListController.__super__.add.apply(this, arguments);
         last_item = items_added.last();
         if ((last_item != null ? last_item.instance.constructor : void 0) === this.ScrollingModel) {
           if (this.infinite_load) {
             this.load_more();
           } else {
+            last_before_item = this.items.rest(items_added.length - 1).first();
+            if (last_before_item != null) {
+              last_before_item.el.waypoint('disable');
+            }
+            this.items[-items_added.length];
             last_item.el.waypoint(this.load_more, {
               continuous: false,
               triggerOnce: true,
