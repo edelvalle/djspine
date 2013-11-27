@@ -409,7 +409,7 @@
         if ((value != null) && field.length) {
           field.val(value);
           field.filter('img').attr('src', value);
-          field.filter('span').text(String(value).escape());
+          field.filter('span').text(String(value));
           return field.trigger('change');
         } else {
           return field.val();
@@ -610,9 +610,9 @@
         var field;
         field = this.get_field(name);
         if (value != null) {
-          return field.text(String(value).escape());
+          return field.text(String(value));
         } else {
-          return (field.text() || '').trim().unescape();
+          return (field.text() || '').trim();
         }
       };
 

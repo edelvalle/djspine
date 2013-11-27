@@ -122,7 +122,7 @@ class Spine?.FormController extends Spine.Controller
         if value? and field.length
             field.val value
             field.filter('img').attr 'src', value
-            field.filter('span').text String(value).escape()
+            field.filter('span').text String(value)
             field.trigger 'change'
         else
             field.val()
@@ -247,9 +247,9 @@ class Spine?.ItemController extends Spine.FormController
     field_value: (name, value) ->
         field = @get_field name
         if value?
-            field.text String(value).escape()
+            field.text String(value)
         else
-            (field.text() or '').trim().unescape()
+            (field.text() or '').trim()
 
     bind_instance: =>
         super
