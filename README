@@ -1,0 +1,57 @@
+
+Spine API
+=========
+
+Provides a REST API for Spine.js applications.
+
+
+Installation
+============
+
+In your settings.py:
+
+    INSTALLED_APPS = (
+        ...
+        'spine',
+        ...
+    )
+
+Then publish the REST API in your urls.py:
+
+    from django.conf.urls import patterns, include, url
+
+    urlpatterns = patterns(
+        '',
+        ...
+        url(r'^', include('spine.urls')),
+        ...
+    )
+
+
+Usage
+=====
+
+To publish an object API write a api.py inside your app.
+
+    from spine.api import SpineAPI
+    from .models import Category
+
+    class CategoryAPI(SpineAPI):
+        model = Category
+
+This will make available the Category API in `/api/<app_name>/Category` URL.
+Where `<app_name>` is the name of the application that contains the Category
+model.
+
+By default the API checks the permissions of the authenticated user to access
+the model. This can be disabled by setting:
+
+   class CategoryAPI(SpineAPI):
+        model = Category
+        permission_checking = False
+
+As Django does not has a 'read' permission this is granted if the user has
+'change' or 'delete' permission.
+
+I suggest you to read the SpineAPI class in the `spine/api.py` file. It has a
+full documentation about its configuration.

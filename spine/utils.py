@@ -108,14 +108,14 @@ def check_permissions(*actions):
         @wraps(method)
         def wrapper(self, request, *args, **kwargs):
             if self.permission_checking:
-                has_perms = request.user.has_perms
+                has_perm = request.user.has_perm
                 app = self.model._meta.app_label
                 model = self.model._meta.module_name
                 perms = [
                     '{app}.{action}_{model}'.format(**locals())
                     for action in actions
                 ]
-                if all(not has_perms(perm) for perm in perms):
+                if all(not has_perm(perm) for perm in perms):
                     return HttpResponseForbidden('Error 403: Forbidden')
             return method(self, request, *args, **kwargs)
         return wrapper
