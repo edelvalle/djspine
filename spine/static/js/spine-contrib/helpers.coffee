@@ -463,7 +463,7 @@ class Spine?.InfiniteListController extends Spine.ListController
                 @load_more()
             else
                 last_before_item = @items.rest(items_added.length - 1).first()
-                last_before_item?.el.waypoint 'disable'
+                last_before_item?.el.waypoint 'destroy'
                 @items[-items_added.length]
                 last_item.el.waypoint @load_more,
                     continuous: false

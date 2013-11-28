@@ -998,7 +998,7 @@
           } else {
             last_before_item = this.items.rest(items_added.length - 1).first();
             if (last_before_item != null) {
-              last_before_item.el.waypoint('disable');
+              last_before_item.el.waypoint('destroy');
             }
             this.items[-items_added.length];
             last_item.el.waypoint(this.load_more, {
