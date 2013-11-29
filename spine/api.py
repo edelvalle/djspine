@@ -205,7 +205,7 @@ class SpineAPI(View):
                 # TODO: test the image viewer in the search view and
                 #   the properties too
                 field_base_name = field_name.split('__', 1)[0]
-                if field_base_name in date_fields:
+                if value is not None and field_base_name in date_fields:
                     value = parse_date(value)
                 data[field_name] = value
             self._data = data
