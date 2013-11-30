@@ -1000,7 +1000,6 @@
             if (last_before_item != null) {
               last_before_item.el.waypoint('destroy');
             }
-            this.items[-items_added.length];
             last_item.el.waypoint(this.load_more, {
               continuous: false,
               triggerOnce: true,
@@ -1048,6 +1047,7 @@
         added_items = InfiniteGridController.__super__.add.apply(this, arguments);
         items = items.concat(added_items);
         this.arrange(items);
+        $.waypoints('refresh');
         return added_items;
       };
 
