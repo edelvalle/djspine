@@ -454,12 +454,23 @@ class Spine?.InfiniteListController extends Spine.ListController
         super
         @page_number = 1
         @infinite_load = false
+        hash_id = parseInt window.location.hash[1..]
+        if hash_id isnt NaN
+            @load_until_id = hash_id
 
     add: =>
         items_added = super
         last_item = items_added.last()
         if last_item?.instance.constructor is @ScrollingModel
-            if @infinite_load
+            if @load_until_id?
+                for item in items_added
+                    if item.instance.id is @load_until_id
+                        # TODO: scroll to item
+                        item.el.addClass 'ui-selected'
+                        @load_until_id = undefined
+                        break
+
+            if @infinite_load or @load_until_id?
                 @load_more()
             else
                 last_before_item = @items.rest(items_added.length - 1).first()
