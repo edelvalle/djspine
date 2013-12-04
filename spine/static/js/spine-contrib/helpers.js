@@ -994,10 +994,13 @@
         items_added = InfiniteListController.__super__.add.apply(this, arguments);
         last_item = items_added.last();
         if ((last_item != null ? last_item.instance.constructor : void 0) === this.ScrollingModel) {
-          if ((this.load_until_id != null) && !this.load_until_id === NaN) {
+          if ((this.load_until_id != null) && !(this.load_until_id === NaN)) {
             for (_i = 0, _len = items_added.length; _i < _len; _i++) {
               item = items_added[_i];
               if (item.instance.id === this.load_until_id) {
+                if (typeof $.scrollTo === "function") {
+                  $.scrollTo("[data-id=" + item.instance.id + "]", 300);
+                }
                 item.el.addClass('ui-selected');
                 this.load_until_id = void 0;
                 break;

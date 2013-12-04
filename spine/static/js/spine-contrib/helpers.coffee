@@ -463,7 +463,7 @@ class Spine?.InfiniteListController extends Spine.ListController
             if @load_until_id? and not(@load_until_id is NaN)
                 for item in items_added
                     if item.instance.id is @load_until_id
-                        # TODO: scroll to item
+                        $.scrollTo? "[data-id=#{item.instance.id}]", 300
                         item.el.addClass 'ui-selected'
                         @load_until_id = undefined
                         break
