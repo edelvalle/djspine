@@ -851,6 +851,10 @@
 
       function ItemWithContextualMenu() {
         this.show_dropdown = __bind(this.show_dropdown, this);
+        this.show_dropdown_if_mouse_is_inside = __bind(this.show_dropdown_if_mouse_is_inside, this);
+        this.on_mouse_leave = __bind(this.on_mouse_leave, this);
+        this.on_mouse_move = __bind(this.on_mouse_move, this);
+        this.on_mouse_enter = __bind(this.on_mouse_enter, this);
         this.refreshElements = __bind(this.refreshElements, this);
         _ref2 = ItemWithContextualMenu.__super__.constructor.apply(this, arguments);
         return _ref2;
@@ -859,12 +863,18 @@
       ItemWithContextualMenu.prototype.DropdownController = Spine.DropdownController;
 
       ItemWithContextualMenu.prototype.events = _.extend(_.clone(Spine.ItemController.prototype.events), {
-        'contextmenu .contextual-dropdown': 'show_dropdown'
+        'mouseenter .contextual-dropdown': 'on_mouse_enter',
+        'mouseleave .contextual-dropdown': 'on_mouse_leave',
+        'mousemove .contextual-dropdown': 'on_mouse_move'
       });
 
       ItemWithContextualMenu.prototype.elements = _.extend(_.clone(Spine.ItemController.prototype.elements), {
         'ul.dropdown-menu': 'menu'
       });
+
+      ItemWithContextualMenu.prototype.mouse_is_inside = false;
+
+      ItemWithContextualMenu.prototype.show_dropdown_is_waiting = false;
 
       ItemWithContextualMenu.prototype.refreshElements = function() {
         var _ref3;
@@ -876,6 +886,29 @@
           el: this.menu,
           item: this
         });
+      };
+
+      ItemWithContextualMenu.prototype.on_mouse_enter = function(e) {
+        this.is_inside = e;
+        if (!this.show_dropdown_is_waiting) {
+          this.show_dropdown_is_waiting = true;
+          return this.delay(this.show_dropdown_if_mouse_is_inside, 1000);
+        }
+      };
+
+      ItemWithContextualMenu.prototype.on_mouse_move = function(e) {
+        return this.is_inside = e;
+      };
+
+      ItemWithContextualMenu.prototype.on_mouse_leave = function(e) {
+        return this.is_inside = false;
+      };
+
+      ItemWithContextualMenu.prototype.show_dropdown_if_mouse_is_inside = function() {
+        if (this.is_inside) {
+          this.show_dropdown(this.is_inside);
+        }
+        return this.show_dropdown_is_waiting = false;
       };
 
       ItemWithContextualMenu.prototype.show_dropdown = function(e) {
@@ -987,6 +1020,9 @@
         this.page_number = 1;
         this.infinite_load = false;
         this.load_until_id = parseInt(window.location.hash.slice(1));
+        if (this.load_until_id === NaN) {
+          this.load_until_id = false;
+        }
       }
 
       InfiniteListController.prototype.add = function() {
@@ -994,7 +1030,7 @@
         items_added = InfiniteListController.__super__.add.apply(this, arguments);
         last_item = items_added.last();
         if ((last_item != null ? last_item.instance.constructor : void 0) === this.ScrollingModel) {
-          if ((this.load_until_id != null) && !(this.load_until_id === NaN)) {
+          if (this.load_until_id) {
             for (_i = 0, _len = items_added.length; _i < _len; _i++) {
               item = items_added[_i];
               if (item.instance.id === this.load_until_id) {
@@ -1002,12 +1038,12 @@
                   $.scrollTo("[data-id=" + item.instance.id + "]", 300);
                 }
                 item.el.addClass('ui-selected');
-                this.load_until_id = void 0;
+                this.load_until_id = false;
                 break;
               }
             }
           }
-          if (this.infinite_load || (this.load_until_id != null)) {
+          if (this.infinite_load || this.load_until_id) {
             this.load_more();
           } else {
             last_before_item = this.items.rest(items_added.length - 1).first();

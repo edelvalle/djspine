@@ -382,18 +382,40 @@ class Spine?.ItemWithContextualMenu extends Spine.ItemController
 
     events: _.extend(
         _.clone Spine.ItemController::events
-        'contextmenu .contextual-dropdown': 'show_dropdown'
+        'mouseenter .contextual-dropdown': 'on_mouse_enter'
+        'mouseleave .contextual-dropdown': 'on_mouse_leave'
+        'mousemove .contextual-dropdown': 'on_mouse_move'
     )
 
     elements: _.extend(
         _.clone Spine.ItemController::elements
         'ul.dropdown-menu': 'menu'
+
     )
+
+    mouse_is_inside: false
+    show_dropdown_is_waiting: false
 
     refreshElements: =>
         super
         @menu_controller?.release()
         @menu_controller = new @DropdownController el: @menu, item: this
+
+    on_mouse_enter: (e) =>
+        @is_inside = e
+        if not @show_dropdown_is_waiting
+            @show_dropdown_is_waiting = true
+            @delay @show_dropdown_if_mouse_is_inside, 1000
+
+    on_mouse_move: (e) =>
+        @is_inside = e
+
+    on_mouse_leave: (e) =>
+        @is_inside = false
+
+    show_dropdown_if_mouse_is_inside: =>
+        @show_dropdown @is_inside if @is_inside
+        @show_dropdown_is_waiting = false
 
     show_dropdown: (e) =>
         e.preventDefault()
@@ -455,20 +477,21 @@ class Spine?.InfiniteListController extends Spine.ListController
         @page_number = 1
         @infinite_load = false
         @load_until_id = parseInt window.location.hash[1..]
+        @load_until_id = false if @load_until_id is NaN
 
     add: =>
         items_added = super
         last_item = items_added.last()
         if last_item?.instance.constructor is @ScrollingModel
-            if @load_until_id? and not(@load_until_id is NaN)
+            if @load_until_id
                 for item in items_added
                     if item.instance.id is @load_until_id
                         $.scrollTo? "[data-id=#{item.instance.id}]", 300
                         item.el.addClass 'ui-selected'
-                        @load_until_id = undefined
+                        @load_until_id = false
                         break
 
-            if @infinite_load or @load_until_id?
+            if @infinite_load or @load_until_id
                 @load_more()
             else
                 last_before_item = @items.rest(items_added.length - 1).first()
