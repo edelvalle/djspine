@@ -983,14 +983,10 @@
         this.activate_infinite_loading = __bind(this.activate_infinite_loading, this);
         this.load_more = __bind(this.load_more, this);
         this.add = __bind(this.add, this);
-        var hash_id;
         InfiniteListController.__super__.constructor.apply(this, arguments);
         this.page_number = 1;
         this.infinite_load = false;
-        hash_id = parseInt(window.location.hash.slice(1));
-        if (hash_id !== NaN) {
-          this.load_until_id = hash_id;
-        }
+        this.load_until_id = parseInt(window.location.hash.slice(1));
       }
 
       InfiniteListController.prototype.add = function() {
@@ -998,7 +994,7 @@
         items_added = InfiniteListController.__super__.add.apply(this, arguments);
         last_item = items_added.last();
         if ((last_item != null ? last_item.instance.constructor : void 0) === this.ScrollingModel) {
-          if (this.load_until_id != null) {
+          if ((this.load_until_id != null) && !this.load_until_id === NaN) {
             for (_i = 0, _len = items_added.length; _i < _len; _i++) {
               item = items_added[_i];
               if (item.instance.id === this.load_until_id) {

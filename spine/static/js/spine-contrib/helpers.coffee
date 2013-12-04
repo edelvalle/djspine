@@ -454,15 +454,13 @@ class Spine?.InfiniteListController extends Spine.ListController
         super
         @page_number = 1
         @infinite_load = false
-        hash_id = parseInt window.location.hash[1..]
-        if hash_id isnt NaN
-            @load_until_id = hash_id
+        @load_until_id = parseInt window.location.hash[1..]
 
     add: =>
         items_added = super
         last_item = items_added.last()
         if last_item?.instance.constructor is @ScrollingModel
-            if @load_until_id?
+            if @load_until_id? and not(@load_until_id is NaN)
                 for item in items_added
                     if item.instance.id is @load_until_id
                         # TODO: scroll to item
