@@ -325,8 +325,9 @@ class Spine?.DropdownController extends Spine.Controller
 
     @set_open: (menu) ->
         menu.el.slideDown 'fast'
-        Spine.DropdownController.hide_open()
-        Spine.DropdownController.open = menu
+        if Spine.DropdownController.open isnt menu
+            Spine.DropdownController.hide_open()
+            Spine.DropdownController.open = menu
 
     @hide_open: (e) ->
         Spine.DropdownController.open?.hide() if not e? or
@@ -394,7 +395,7 @@ class Spine?.ItemWithContextualMenu extends Spine.ItemController
     )
 
     mouse_is_inside: false
-    show_dropdown_is_waiting: false
+    timer: null
 
     refreshElements: =>
         super
@@ -402,20 +403,22 @@ class Spine?.ItemWithContextualMenu extends Spine.ItemController
         @menu_controller = new @DropdownController el: @menu, item: this
 
     on_mouse_enter: (e) =>
-        @is_inside = e
-        if not @show_dropdown_is_waiting
-            @show_dropdown_is_waiting = true
-            @delay @show_dropdown_if_mouse_is_inside, 1000
+        @mouse_event = e
+        if @timer is null
+            @timer = @delay @show_dropdown_if_mouse_is_inside, 1000
 
     on_mouse_move: (e) =>
-        @is_inside = e
+        @mouse_event = e
 
     on_mouse_leave: (e) =>
-        @is_inside = false
+        @timer = null
+        clearTimeout @timer
+        @mouse_event = false
 
     show_dropdown_if_mouse_is_inside: =>
-        @show_dropdown @is_inside if @is_inside
-        @show_dropdown_is_waiting = false
+        if @timer isnt null
+            @show_dropdown @mouse_event
+            @timer = null
 
     show_dropdown: (e) =>
         e.preventDefault()

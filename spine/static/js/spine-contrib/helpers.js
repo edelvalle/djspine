@@ -741,8 +741,10 @@
 
       DropdownController.set_open = function(menu) {
         menu.el.slideDown('fast');
-        Spine.DropdownController.hide_open();
-        return Spine.DropdownController.open = menu;
+        if (Spine.DropdownController.open !== menu) {
+          Spine.DropdownController.hide_open();
+          return Spine.DropdownController.open = menu;
+        }
       };
 
       DropdownController.hide_open = function(e) {
@@ -874,7 +876,7 @@
 
       ItemWithContextualMenu.prototype.mouse_is_inside = false;
 
-      ItemWithContextualMenu.prototype.show_dropdown_is_waiting = false;
+      ItemWithContextualMenu.prototype.timer = null;
 
       ItemWithContextualMenu.prototype.refreshElements = function() {
         var _ref3;
@@ -889,26 +891,27 @@
       };
 
       ItemWithContextualMenu.prototype.on_mouse_enter = function(e) {
-        this.is_inside = e;
-        if (!this.show_dropdown_is_waiting) {
-          this.show_dropdown_is_waiting = true;
-          return this.delay(this.show_dropdown_if_mouse_is_inside, 1000);
+        this.mouse_event = e;
+        if (this.timer === null) {
+          return this.timer = this.delay(this.show_dropdown_if_mouse_is_inside, 1000);
         }
       };
 
       ItemWithContextualMenu.prototype.on_mouse_move = function(e) {
-        return this.is_inside = e;
+        return this.mouse_event = e;
       };
 
       ItemWithContextualMenu.prototype.on_mouse_leave = function(e) {
-        return this.is_inside = false;
+        this.timer = null;
+        clearTimeout(this.timer);
+        return this.mouse_event = false;
       };
 
       ItemWithContextualMenu.prototype.show_dropdown_if_mouse_is_inside = function() {
-        if (this.is_inside) {
-          this.show_dropdown(this.is_inside);
+        if (this.timer !== null) {
+          this.show_dropdown(this.mouse_event);
+          return this.timer = null;
         }
-        return this.show_dropdown_is_waiting = false;
       };
 
       ItemWithContextualMenu.prototype.show_dropdown = function(e) {
