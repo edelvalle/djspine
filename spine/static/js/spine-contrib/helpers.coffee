@@ -322,6 +322,7 @@ RIGHT_MOUSE_BUTTON = 3
 
 class Spine?.DropdownController extends Spine.Controller
     @open: null
+    selected_items_selector: '.ui-selected'
 
     @set_open: (menu) ->
         menu.el.slideDown 'fast'
@@ -333,7 +334,17 @@ class Spine?.DropdownController extends Spine.Controller
         Spine.DropdownController.open?.hide() if not e? or
             e?.which isnt RIGHT_MOUSE_BUTTON
 
+    are_multiple_items_selected: ->
+        return $(@selected_items_selector).length > 1
+
     show: (e) =>
+        not_common_items = @$('li').not('.common')
+        @log @are_multiple_items_selected()
+        if @are_multiple_items_selected()
+            not_common_items.hide()
+        else
+            not_common_items.show()
+
         if e?.pageX? and e?.pageY?
             do positionate_under_the_mouse = =>
                 @el.css
@@ -356,13 +367,14 @@ class Spine?.EditionDropdown extends Spine.DropdownController
         'click .remove-action': 'remove_instances'
 
     name_attr: 'name'
+    selected_items_selector: '.ui-selected[data-model][data-id]'
 
     focus_name: (e) =>
         e?.preventDefault()
         (@item.get_field @name_attr).focus()
 
     selected_references: =>
-        for selected in $('.ui-selected[data-model][data-id]')
+        for selected in $ @selected_items_selector
             {
                 model: selected.getAttribute 'data-model'
                 id: +selected.getAttribute 'data-id'

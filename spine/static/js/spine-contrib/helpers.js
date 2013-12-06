@@ -739,6 +739,8 @@
 
       DropdownController.open = null;
 
+      DropdownController.prototype.selected_items_selector = '.ui-selected';
+
       DropdownController.set_open = function(menu) {
         menu.el.slideDown('fast');
         if (Spine.DropdownController.open !== menu) {
@@ -754,9 +756,20 @@
         }
       };
 
+      DropdownController.prototype.are_multiple_items_selected = function() {
+        return $(this.selected_items_selector).length > 1;
+      };
+
       DropdownController.prototype.show = function(e) {
-        var positionate_under_the_mouse,
+        var not_common_items, positionate_under_the_mouse,
           _this = this;
+        not_common_items = this.$('li').not('.common');
+        this.log(this.are_multiple_items_selected());
+        if (this.are_multiple_items_selected()) {
+          not_common_items.hide();
+        } else {
+          not_common_items.show();
+        }
         if (((e != null ? e.pageX : void 0) != null) && ((e != null ? e.pageY : void 0) != null)) {
           (positionate_under_the_mouse = function() {
             return _this.el.css({
@@ -803,6 +816,8 @@
 
       EditionDropdown.prototype.name_attr = 'name';
 
+      EditionDropdown.prototype.selected_items_selector = '.ui-selected[data-model][data-id]';
+
       EditionDropdown.prototype.focus_name = function(e) {
         if (e != null) {
           e.preventDefault();
@@ -812,7 +827,7 @@
 
       EditionDropdown.prototype.selected_references = function() {
         var selected, _i, _len, _ref2, _results;
-        _ref2 = $('.ui-selected[data-model][data-id]');
+        _ref2 = $(this.selected_items_selector);
         _results = [];
         for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
           selected = _ref2[_i];
