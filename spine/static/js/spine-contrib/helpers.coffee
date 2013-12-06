@@ -286,7 +286,7 @@ class Spine?.ModalController extends Spine.Controller
     elements:
         '.title': 'title'
         '.modal-body': 'body'
-        '[name]:visible': 'first_visible_field'
+        '[type][name]:visible:first': 'first_visible_field'
 
     events:
         'click .cancel': 'hide'
@@ -309,7 +309,7 @@ class Spine?.ModalController extends Spine.Controller
         @el.modal 'hide'
 
     shown: =>
-        @$('[type][name]:visible:first').focus()
+        @first_visible_field.focus()
 
     save: =>
         @body_controller?.save?()

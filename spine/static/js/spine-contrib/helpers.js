@@ -672,7 +672,7 @@
       ModalController.prototype.elements = {
         '.title': 'title',
         '.modal-body': 'body',
-        '[name]:visible': 'first_visible_field'
+        '[type][name]:visible:first': 'first_visible_field'
       };
 
       ModalController.prototype.events = {
@@ -712,7 +712,7 @@
       };
 
       ModalController.prototype.shown = function() {
-        return this.$('[type][name]:visible:first').focus();
+        return this.first_visible_field.focus();
       };
 
       ModalController.prototype.save = function() {
