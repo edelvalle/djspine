@@ -382,12 +382,11 @@ class Spine?.EditionDropdown extends Spine.DropdownController
     remove_instances: (e) =>
         e?.preventDefault()
         references = @selected_references()
-        if references.length and confirm gettext 'Are you sure?'
+        if confirm gettext 'Are you sure?'
             for reference in references
                 eval(reference.model).destroy reference.id
         else
-            @item.destroy_instance()
-
+            @hide()
 
 class Spine?.ItemWithContextualMenu extends Spine.ItemController
     DropdownController: Spine.DropdownController

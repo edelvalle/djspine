@@ -844,7 +844,7 @@
           e.preventDefault();
         }
         references = this.selected_references();
-        if (references.length && confirm(gettext('Are you sure?'))) {
+        if (confirm(gettext('Are you sure?'))) {
           _results = [];
           for (_i = 0, _len = references.length; _i < _len; _i++) {
             reference = references[_i];
@@ -852,7 +852,7 @@
           }
           return _results;
         } else {
-          return this.item.destroy_instance();
+          return this.hide();
         }
       };
 
