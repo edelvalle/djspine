@@ -241,9 +241,6 @@ class Spine?.ItemController extends Spine.FormController
         'blur [contenteditable][name]': 'trigger_field_change'
         'change [name]': 'save'
 
-    constructor: ->
-        super
-
     field_value: (name, value) ->
         field = @get_field name
         if value?
