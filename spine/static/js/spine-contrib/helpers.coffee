@@ -339,7 +339,6 @@ class Spine?.DropdownController extends Spine.Controller
 
     show: (e) =>
         not_common_items = @$('li').not('.common')
-        @log @are_multiple_items_selected()
         if @are_multiple_items_selected()
             not_common_items.hide()
         else
@@ -409,10 +408,17 @@ class Spine?.ItemWithContextualMenu extends Spine.ItemController
     mouse_is_inside: false
     timer: null
 
-    refreshElements: =>
+    refreshElements: ->
         super
         @menu_controller?.release()
         @menu_controller = new @DropdownController el: @menu, item: this
+
+    delegateEvents: ->
+        super
+        @el.bind 'click', @on_click
+
+    on_click: =>
+        @on_mouse_leave()
 
     on_mouse_enter: (e) =>
         @mouse_event = e
@@ -422,9 +428,9 @@ class Spine?.ItemWithContextualMenu extends Spine.ItemController
     on_mouse_move: (e) =>
         @mouse_event = e
 
-    on_mouse_leave: (e) =>
-        @timer = null
+    on_mouse_leave: =>
         clearTimeout @timer
+        @timer = null
         @mouse_event = false
 
     show_dropdown_if_mouse_is_inside: =>

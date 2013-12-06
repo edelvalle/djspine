@@ -764,7 +764,6 @@
         var not_common_items, positionate_under_the_mouse,
           _this = this;
         not_common_items = this.$('li').not('.common');
-        this.log(this.are_multiple_items_selected());
         if (this.are_multiple_items_selected()) {
           not_common_items.hide();
         } else {
@@ -872,7 +871,7 @@
         this.on_mouse_leave = __bind(this.on_mouse_leave, this);
         this.on_mouse_move = __bind(this.on_mouse_move, this);
         this.on_mouse_enter = __bind(this.on_mouse_enter, this);
-        this.refreshElements = __bind(this.refreshElements, this);
+        this.on_click = __bind(this.on_click, this);
         _ref2 = ItemWithContextualMenu.__super__.constructor.apply(this, arguments);
         return _ref2;
       }
@@ -905,6 +904,15 @@
         });
       };
 
+      ItemWithContextualMenu.prototype.delegateEvents = function() {
+        ItemWithContextualMenu.__super__.delegateEvents.apply(this, arguments);
+        return this.el.bind('click', this.on_click);
+      };
+
+      ItemWithContextualMenu.prototype.on_click = function() {
+        return this.on_mouse_leave();
+      };
+
       ItemWithContextualMenu.prototype.on_mouse_enter = function(e) {
         this.mouse_event = e;
         if (this.timer === null) {
@@ -916,9 +924,9 @@
         return this.mouse_event = e;
       };
 
-      ItemWithContextualMenu.prototype.on_mouse_leave = function(e) {
-        this.timer = null;
+      ItemWithContextualMenu.prototype.on_mouse_leave = function() {
         clearTimeout(this.timer);
+        this.timer = null;
         return this.mouse_event = false;
       };
 
