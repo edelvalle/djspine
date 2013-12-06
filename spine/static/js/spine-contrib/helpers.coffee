@@ -367,6 +367,7 @@ class Spine?.EditionDropdown extends Spine.DropdownController
 
     focus_name: (e) =>
         e?.preventDefault()
+        @hide()
         (@item.get_field @name_attr).focus()
 
     selected_references: =>
