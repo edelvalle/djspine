@@ -391,9 +391,9 @@ class Spine?.ItemWithContextualMenu extends Spine.ItemController
 
     events: _.extend(
         _.clone Spine.ItemController::events
-        'mouseenter .contextual-dropdown': 'on_mouse_enter'
-        'mouseleave .contextual-dropdown': 'on_mouse_leave'
-        'mousemove .contextual-dropdown': 'on_mouse_move'
+        'mouseenter .contextual-dropdown': 'start_dalay_to_show_dropdown'
+        'mouseleave .contextual-dropdown': 'prevent_show_the_dropdown'
+        'mousemove .contextual-dropdown': 'register_mouse_position'
     )
 
     elements: _.extend(
@@ -412,23 +412,21 @@ class Spine?.ItemWithContextualMenu extends Spine.ItemController
 
     delegateEvents: ->
         super
-        @el.bind 'click', @on_click
+        @el.bind 'click', @prevent_show_the_dropdown
 
-    on_click: =>
-        @on_mouse_leave()
-
-    on_mouse_enter: (e) =>
+    start_dalay_to_show_dropdown: (e) =>
         @mouse_event = e
         if @timer is null
             @timer = @delay @show_dropdown_if_mouse_is_inside, 1000
 
-    on_mouse_move: (e) =>
+    register_mouse_position: (e) =>
         @mouse_event = e
 
-    on_mouse_leave: =>
+    prevent_show_the_dropdown: =>
         clearTimeout @timer
         @timer = null
         @mouse_event = false
+        true  # if this returns false, the click event is omitted
 
     show_dropdown_if_mouse_is_inside: =>
         if @timer isnt null

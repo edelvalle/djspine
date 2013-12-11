@@ -870,10 +870,9 @@
       function ItemWithContextualMenu() {
         this.show_dropdown = __bind(this.show_dropdown, this);
         this.show_dropdown_if_mouse_is_inside = __bind(this.show_dropdown_if_mouse_is_inside, this);
-        this.on_mouse_leave = __bind(this.on_mouse_leave, this);
-        this.on_mouse_move = __bind(this.on_mouse_move, this);
-        this.on_mouse_enter = __bind(this.on_mouse_enter, this);
-        this.on_click = __bind(this.on_click, this);
+        this.prevent_show_the_dropdown = __bind(this.prevent_show_the_dropdown, this);
+        this.register_mouse_position = __bind(this.register_mouse_position, this);
+        this.start_dalay_to_show_dropdown = __bind(this.start_dalay_to_show_dropdown, this);
         _ref3 = ItemWithContextualMenu.__super__.constructor.apply(this, arguments);
         return _ref3;
       }
@@ -881,9 +880,9 @@
       ItemWithContextualMenu.prototype.DropdownController = Spine.DropdownController;
 
       ItemWithContextualMenu.prototype.events = _.extend(_.clone(Spine.ItemController.prototype.events), {
-        'mouseenter .contextual-dropdown': 'on_mouse_enter',
-        'mouseleave .contextual-dropdown': 'on_mouse_leave',
-        'mousemove .contextual-dropdown': 'on_mouse_move'
+        'mouseenter .contextual-dropdown': 'start_dalay_to_show_dropdown',
+        'mouseleave .contextual-dropdown': 'prevent_show_the_dropdown',
+        'mousemove .contextual-dropdown': 'register_mouse_position'
       });
 
       ItemWithContextualMenu.prototype.elements = _.extend(_.clone(Spine.ItemController.prototype.elements), {
@@ -908,28 +907,25 @@
 
       ItemWithContextualMenu.prototype.delegateEvents = function() {
         ItemWithContextualMenu.__super__.delegateEvents.apply(this, arguments);
-        return this.el.bind('click', this.on_click);
+        return this.el.bind('click', this.prevent_show_the_dropdown);
       };
 
-      ItemWithContextualMenu.prototype.on_click = function() {
-        return this.on_mouse_leave();
-      };
-
-      ItemWithContextualMenu.prototype.on_mouse_enter = function(e) {
+      ItemWithContextualMenu.prototype.start_dalay_to_show_dropdown = function(e) {
         this.mouse_event = e;
         if (this.timer === null) {
           return this.timer = this.delay(this.show_dropdown_if_mouse_is_inside, 1000);
         }
       };
 
-      ItemWithContextualMenu.prototype.on_mouse_move = function(e) {
+      ItemWithContextualMenu.prototype.register_mouse_position = function(e) {
         return this.mouse_event = e;
       };
 
-      ItemWithContextualMenu.prototype.on_mouse_leave = function() {
+      ItemWithContextualMenu.prototype.prevent_show_the_dropdown = function() {
         clearTimeout(this.timer);
         this.timer = null;
-        return this.mouse_event = false;
+        this.mouse_event = false;
+        return true;
       };
 
       ItemWithContextualMenu.prototype.show_dropdown_if_mouse_is_inside = function() {
