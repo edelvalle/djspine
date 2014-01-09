@@ -869,10 +869,6 @@
 
       function ItemWithContextualMenu() {
         this.show_dropdown = __bind(this.show_dropdown, this);
-        this.show_dropdown_if_mouse_is_inside = __bind(this.show_dropdown_if_mouse_is_inside, this);
-        this.prevent_show_the_dropdown = __bind(this.prevent_show_the_dropdown, this);
-        this.register_mouse_position = __bind(this.register_mouse_position, this);
-        this.start_dalay_to_show_dropdown = __bind(this.start_dalay_to_show_dropdown, this);
         _ref3 = ItemWithContextualMenu.__super__.constructor.apply(this, arguments);
         return _ref3;
       }
@@ -880,18 +876,12 @@
       ItemWithContextualMenu.prototype.DropdownController = Spine.DropdownController;
 
       ItemWithContextualMenu.prototype.events = _.extend(_.clone(Spine.ItemController.prototype.events), {
-        'mouseenter .contextual-dropdown': 'start_dalay_to_show_dropdown',
-        'mouseleave .contextual-dropdown': 'prevent_show_the_dropdown',
-        'mousemove .contextual-dropdown': 'register_mouse_position'
+        'contextmenu .contextual-dropdown': 'show_dropdown'
       });
 
       ItemWithContextualMenu.prototype.elements = _.extend(_.clone(Spine.ItemController.prototype.elements), {
         'ul.dropdown-menu': 'menu'
       });
-
-      ItemWithContextualMenu.prototype.mouse_is_inside = false;
-
-      ItemWithContextualMenu.prototype.timer = null;
 
       ItemWithContextualMenu.prototype.refreshElements = function() {
         var _ref4;
@@ -903,36 +893,6 @@
           el: this.menu,
           item: this
         });
-      };
-
-      ItemWithContextualMenu.prototype.delegateEvents = function() {
-        ItemWithContextualMenu.__super__.delegateEvents.apply(this, arguments);
-        return this.el.bind('click', this.prevent_show_the_dropdown);
-      };
-
-      ItemWithContextualMenu.prototype.start_dalay_to_show_dropdown = function(e) {
-        this.mouse_event = e;
-        if (this.timer === null) {
-          return this.timer = this.delay(this.show_dropdown_if_mouse_is_inside, 1000);
-        }
-      };
-
-      ItemWithContextualMenu.prototype.register_mouse_position = function(e) {
-        return this.mouse_event = e;
-      };
-
-      ItemWithContextualMenu.prototype.prevent_show_the_dropdown = function() {
-        clearTimeout(this.timer);
-        this.timer = null;
-        this.mouse_event = false;
-        return true;
-      };
-
-      ItemWithContextualMenu.prototype.show_dropdown_if_mouse_is_inside = function() {
-        if (this.timer !== null) {
-          this.show_dropdown(this.mouse_event);
-          return this.timer = null;
-        }
       };
 
       ItemWithContextualMenu.prototype.show_dropdown = function(e) {
