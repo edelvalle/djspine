@@ -52,7 +52,6 @@ class SpineJSONEncoder(json.JSONEncoder):
                     qs = obj.pop(field_name).all()
                     obj[field_name + '_id'] = qs.values_list('pk', flat=True)
             return obj
-
         elif callable(obj):
             return obj()
 
