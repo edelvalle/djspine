@@ -372,10 +372,8 @@ class Spine?.EditionDropdown extends Spine.DropdownController
 
     selected_references: =>
         for selected in $ @selected_items_selector
-            {
-                model: selected.getAttribute 'data-model'
-                id: +selected.getAttribute 'data-id'
-            }
+            model: selected.getAttribute 'data-model'
+            id: +selected.getAttribute 'data-id'
 
     remove_instances: (e) =>
         e?.preventDefault()
