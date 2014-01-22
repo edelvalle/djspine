@@ -360,16 +360,9 @@ if Spine?.DropdownController?
 
 class Spine?.EditionDropdown extends Spine.DropdownController
     events:
-        'click .rename-action': 'focus_name'
         'click .remove-action': 'remove_instances'
 
-    name_attr: 'name'
     selected_items_selector: '.ui-selected[data-model][data-id]'
-
-    focus_name: (e) =>
-        e?.preventDefault()
-        @hide()
-        (@item.get_field @name_attr).focus()
 
     selected_references: =>
         for selected in $ @selected_items_selector
