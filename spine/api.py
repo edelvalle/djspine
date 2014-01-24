@@ -27,6 +27,7 @@ import json
 from itertools import chain
 
 from xoutil.string import cut_suffix
+from xoutil.iterators import first_non_null
 from dateutil.parser import parse as parse_date
 
 from django.db.models import DateField, TimeField, DateTimeField
@@ -273,11 +274,14 @@ class SpineAPI(View):
         """
         Handle a GET request for a full collection (when no id was provided).
         """
-        method_name = 'filter'
-        for manager_method_name in self.manager_methods:
-            if manager_method_name in self._real_data:
-                method_name = manager_method_name
-                break
+        method_name = first_non_null(
+            (
+                manager_method_name
+                for manager_method_name in self.manager_methods
+                if manager_method_name in self._real_data
+            ),
+            default='filter'
+        )
         method = getattr(self.base_queryset, method_name)
         queryset = method(**self.data)
         return self.success_response(queryset)
