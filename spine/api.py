@@ -284,6 +284,8 @@ class SpineAPI(View):
         )
         method = getattr(self.base_queryset, method_name)
         queryset = method(**self.data)
+        if queryset is None:
+            queryset = []
         return self.success_response(queryset)
 
     # POST & PUT requests
