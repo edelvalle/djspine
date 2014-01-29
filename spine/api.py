@@ -33,6 +33,7 @@ from dateutil.parser import parse as parse_date
 from django.db.models import DateField, TimeField, DateTimeField
 from django.db.models.query import QuerySet
 from django.db.models.fields import related
+from django.db.models.fields.related import ManyRelatedObjectsDescriptor
 from django.forms.models import modelform_factory
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, Http404
@@ -528,4 +529,12 @@ class SpineAPI(View):
     def get_form_fields(cls):
         fields = cls.get_all_serialize_field_names()
         model_fields = cls.model._meta.get_all_field_names()
-        return [f for f in fields if f in model_fields]
+        return [
+            f
+            for f in fields
+            if f in model_fields and
+            not isinstance(
+                getattr(cls.model, f, None),
+                ManyRelatedObjectsDescriptor
+            )
+        ]
