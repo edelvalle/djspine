@@ -272,7 +272,10 @@ class Spine?.ItemController extends Spine.FormController
         window.getSelection().removeAllRanges()
 
     render: =>
+        selected = @el.hasClass 'ui-selected'
         @replace @template @instance
+        @el.addClass 'ui-selected' if selected
+        @el
 
     reset_form: =>
         @fields.text('')
