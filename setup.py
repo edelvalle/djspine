@@ -8,7 +8,7 @@ from setuptools import setup, find_packages
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
-version = '1.0.1'
+version = '1.1.0'
 
 setup(
     name='spine',
@@ -36,8 +36,8 @@ setup(
     zip_safe=False,
     setup_requires=['setuptools-git'],
     install_requires=[
-        'Django',
-        'xoutil',
-        'python-dateutil'
+        'Django>=1.5,<1.7',
+        'xoutil>=1.4.2,<1.6',
+        'python-dateutil>=2.1,<3'
     ],
 )
