@@ -1,7 +1,7 @@
 Events =
   bind: (ev, callback) ->
     evs   = ev.split(' ')
-    calls = @hasOwnProperty('_callbacks') and @_callbacks or= {}
+    calls = if @hasOwnProperty('_callbacks') then @_callbacks else {}
     for name in evs
       calls[name] or= []
       calls[name].push(callback)
