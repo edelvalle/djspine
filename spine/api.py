@@ -418,13 +418,13 @@ class SpineAPI(View):
     def response(self, output='', http_response_class=HttpResponse):
         """
         Takes some object and serialize it, then converts it to HttpResponse
-        with the correct mimetype
+        with the correct content type
 
         If nothig is passed the response is empty
         """
         if output != '':
             output = self._serialize(self._paginate(output))
-        return http_response_class(output, mimetype='application/json')
+        return http_response_class(output, content_type='application/json')
 
     def _paginate(self, queryset):
         """
