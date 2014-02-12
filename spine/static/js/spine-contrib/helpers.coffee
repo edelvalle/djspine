@@ -11,7 +11,10 @@ $.getSelectedElements = (selector) ->
     selection = window.getSelection()
     range = []
     if selection.rangeCount
-        range = selection.getRangeAt(0).cloneContents().childNodes
+        range = selection
+            .getRangeAt(0)
+            .cloneContents()
+            .childNodes
     if selector?
         jQuery selector, range
     else
@@ -180,11 +183,11 @@ class Spine?.FormController extends Spine.Controller
                 @$('.alert').slideDown()
 
             for attr, msg of errors
-                (@get_field attr)
-                    .parents('.control-group')
-                    .addClass('error')
-                    .tooltip(title: msg)
-                    .tooltip('show')
+                @get_field attr
+                    .parents '.control-group'
+                    .addClass 'error'
+                    .tooltip title: msg
+                    .tooltip 'show'
 
     hide_errors: =>
         (@control_groups.removeClass 'error').tooltip 'destroy'
