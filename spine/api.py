@@ -204,8 +204,6 @@ class SpineAPI(View):
                 cuted_field = cut_suffix(field_name, '_id')
                 if field_name.endswith('_id') and cuted_field in relational:
                     field_name = cuted_field
-                # TODO: test the image viewer in the search view and
-                #   the properties too
                 field_base_name = field_name.split('__', 1)[0]
                 if value is not None and field_base_name in date_fields:
                     value = parse_date(value)
