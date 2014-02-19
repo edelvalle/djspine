@@ -370,8 +370,10 @@ class Spine?.EditionDropdown extends Spine.DropdownController
 
     selected_items_selector: '.ui-selected[data-model][data-id]'
 
-    selected_references: =>
-        for selected in $ @selected_items_selector
+    selected_references: (model) =>
+        selector = @selected_items_selector
+        selector += "[data-model='#{model}']" if model
+        for selected in $ selector
             model: selected.getAttribute 'data-model'
             id: +selected.getAttribute 'data-id'
 
