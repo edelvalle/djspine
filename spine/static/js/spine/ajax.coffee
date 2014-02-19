@@ -172,7 +172,7 @@ class Singleton extends Base
       params, {
         type: 'PUT'
         contentType: 'application/json'
-        data: @record.toJSON()
+        data: if options.kwargs? then JSON.stringify(options.kwargs) else @record.toJSON()
         url: options.url
       }, @record
     ).done(@recordResponse(options))

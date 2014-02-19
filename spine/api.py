@@ -39,6 +39,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, Http404
 from django.views.generic import View
 from django.conf.urls import url
+from django.utils.translation import ugettext_lazy as _
 
 from .utils import get_app_label, flatten_dict, get_related_model
 from .utils import select_fields, check_permissions
@@ -104,6 +105,7 @@ class SpineAPI(View):
         create -> POST   /api/app_name/ModelName
         read   -> GET    /api/app_name/ModelName[/id]
         update -> PUT    /api/app_name/ModelName/id
+        update -> PUT    /api/app_name/ModelName/id/method
         delete -> DELETE /api/app_name/ModelName/id
     """
 
@@ -116,6 +118,9 @@ class SpineAPI(View):
 
     # Manager methods allowed to use for queryset
     manager_methods = ()
+
+    # Model methods allowed to use in PUT requests
+    model_methods = ()
 
     # Methods allowed by the API View
     http_method_names = ('get', 'post', 'put', 'delete')
@@ -250,7 +255,7 @@ class SpineAPI(View):
 
     # GET request
     @check_permissions('change', 'delete')
-    def get(self, request, id=None):
+    def get(self, request, id=None, *args, **kwargs):
         """
         Handle GET requests, either for a single resource or a collection.
         """
@@ -289,7 +294,7 @@ class SpineAPI(View):
 
     # POST & PUT requests
     @check_permissions('add')
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         """
         Handle a POST request by adding a new model instance.
 
@@ -306,7 +311,7 @@ class SpineAPI(View):
         return True
 
     @check_permissions('change')
-    def put(self, request, id=None):
+    def put(self, request, id=None, method=None):
         """
         Handle a PUT request by editing an existing model.
 
@@ -321,7 +326,17 @@ class SpineAPI(View):
         except ObjectDoesNotExist:
             raise Http404()
 
-        return self._process_form(self.edit_form_class, instance=instance)
+        if method is None:
+            return self._process_form(self.edit_form_class, instance=instance)
+        else:
+            if method in self.model_methods:
+                getattr(instance, method)(**self._real_data)
+                return self.success_response(instance)
+            else:
+                return self.validation_error_response(
+                    instance,
+                    output=_('Method "{0}" not allowed').format(method)
+                )
 
     # Form Processing methods
 
@@ -469,7 +484,10 @@ class SpineAPI(View):
 
     @classmethod
     def _get_url_pattern(cls, add_pk=False):
-        pk_pattern = '/' + cls.pk_pattern if add_pk else r''
+        pk_pattern = ''
+        if add_pk:
+            pk_pattern = r'/' + cls.pk_pattern + r'(/(?P<method>\w+))?'
+
         my_url = r'^{0}{1}$'.format(cls.get_url()[1:], pk_pattern)
 
         pk_name = cls.pk_name if add_pk else ''

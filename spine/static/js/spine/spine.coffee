@@ -325,6 +325,12 @@ class Model extends Module
     @trigger('save', options)
     record
 
+  call: (method, kwargs = {}, options = {}) ->
+    if not @isNew()
+      options.kwargs ?= kwargs
+      options.url ?= "#{@url()}/#{method}"
+      @save options
+
   stripCloneAttrs: ->
     return if @hasOwnProperty 'cid' # Make sure it's not the raw object
     for own key, value of @
