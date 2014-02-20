@@ -60,10 +60,14 @@ def object_to_dict(obj, attrs):
     """
     result = {}
     for attr in attrs:
-        value = getattr(obj, attr, None)
-        if callable(value):
-            value = value()
-        result[attr] = value
+        try:
+            value = getattr(obj, attr, None)
+            if callable(value):
+                value = value()
+            result[attr] = value
+        except ValueError:
+            if obj.pk is not None:
+                raise
     return result
 
 
