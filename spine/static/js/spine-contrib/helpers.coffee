@@ -250,7 +250,7 @@ class Spine?.ItemController extends Spine.FormController
         if value?
             field.text String(value)
         else
-            (field.text() or '').trim()
+            (field.val() or field.text() or '').trim()
 
     bind_instance: =>
         super
