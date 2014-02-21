@@ -248,9 +248,10 @@ class Spine?.ItemController extends Spine.FormController
     field_value: (name, value) ->
         field = @get_field name
         if value?
-            field.text String(value)
+            value = String(value)
+            field.text(value).val(value)
         else
-            (field.val() or field.text() or '').trim()
+            (field.text() or field.val() or '').trim()
 
     bind_instance: =>
         super
