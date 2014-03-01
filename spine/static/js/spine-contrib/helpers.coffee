@@ -98,11 +98,32 @@ $ ->
         $(document).ajaxStart -> $loading.fadeIn()
         $(document).ajaxStop -> $loading.fadeOut 'fast'
 
-Spine.Model.updateInstance = (old_instance, instance) ->
-    for attr, value of instance.attributes?() or instance
-        old_instance[attr] = value
-    old_instance.trigger 'update'
-    old_instance
+
+
+class Spine.Model extends Spine.Model
+    constructor: ->
+        super
+        @bind 'ajaxError', @processAjaxError
+
+    updateFrom: (instance) ->
+        for attr, value of instance.attributes?() or instance
+            @[attr] = value
+        @trigger 'update'
+
+    processAjaxError: (instance, xhr) =>
+        try
+            error_data = JSON.parse xhr.responseText
+            if (not 'errors' of error_data or
+                  not 'instance' of error_data)
+                throw SyntaxError
+        catch error
+            if xhr.status isnt 200
+                alert 'Error: there is a communication error!'
+            throw error
+
+        @id = null if @cid is @id
+        @updateFrom error_data.instance
+        @trigger 'error', error_data.errors
 
 
 class Spine?.FormController extends Spine.Controller
@@ -145,56 +166,40 @@ class Spine?.FormController extends Spine.Controller
         @bind_instance()
 
     bind_instance: ->
-        @instance.bind 'ajaxError', @show_errors
-        @instance.bind 'ajaxSuccess', @on_saved
+        @instance.bind 'error', @show_errors
 
     unbind_instance: ->
-        @instance.unbind 'ajaxError', @show_errors
-        @instance.unbind 'ajaxSuccess', @on_saved
+        @instance.unbind 'error', @show_errors
 
-    show_errors: (_instance, xhr) =>
-        parse_error_response = (xhr) ->
-            # reads the error message
-            try
-                error_data = JSON.parse xhr.responseText
-                if (not 'errors' of error_data or
-                    not 'instance' of error_data)
-                        throw SyntaxError
-            catch error
-                if xhr.status isnt 200
-                    alert 'Error: there is a communication error!'
-                throw error
-            return [error_data.instance, error_data.errors]
+    show_errors: (instance, errors) =>
+        if errors.__all__?
+            @el.prepend """
+                <div class="alert hide alert-error text-center">
+                    #{errors.__all__}
+                </div>
+            """
+            @$('.alert').slideDown()
 
-        [instance, errors] = parse_error_response xhr
-
-        do restore_instance_state = =>
-            if @instance.cid is @instance.id
-                @instance.id = null
-            @instance = Spine.Model.updateInstance @instance, instance
-
-        do show_errors = =>
-            if errors.__all__?
-                @el.prepend """
-                    <div class="alert hide alert-error text-center">
-                        #{errors.__all__}
-                    </div>
-                """
-                @$('.alert').slideDown()
-
-            for attr, msg of errors
-                @get_field attr
-                    .parents '.control-group'
-                    .addClass 'error'
-                    .tooltip title: msg
-                    .tooltip 'show'
+        for attr, msg of errors
+            @get_field attr
+                .attr 'data-title', field.attr 'title'
+                .removeAttr 'title'
+                .tooltip title: msg
+                .tooltip 'show'
+                .parents '.control-group'
+                .addClass 'error'
 
     hide_errors: =>
-        (@control_groups.removeClass 'error').tooltip 'destroy'
+        @control_groups.removeClass 'error'
+        @fields.tooltip 'destroy'
+        for field in @fields
+            field.title = field.getAttribute 'data-title'
         @$('.alert').slideUp 'fast', -> @remove()
 
     reset_form: =>
-        @fields.val ''
+        @fields
+            .val ''
+            .text ''
         @hide_errors()
 
     populate_fields: =>
@@ -224,11 +229,10 @@ class Spine?.FormController extends Spine.Controller
     save: =>
         if @populate_instance()
             @hide_errors()
-            @instance.save()
+            @instance.save done: @on_saved
 
-    on_saved: (old_instance, new_instance) =>
+    on_saved: =>
         @reset_form()
-        @instance = Spine.Model.updateInstance @instance, new_instance
         @unbind_instance()
         @parent?.hide?()
 
@@ -282,10 +286,10 @@ class Spine?.ItemController extends Spine.FormController
         @el
 
     reset_form: =>
-        @fields.text('')
         @hide_errors()
 
     unbind_instance: =>
+    on_saved: =>
 
 
 class Spine?.ModalController extends Spine.Controller
@@ -444,9 +448,8 @@ class Spine?.ListController extends Spine.Controller
                 (instance.cid is item.instance.cid) or
                 (instance.id and instance.id is item.instance.id)
             )
-
         if item?
-            Spine.Model.updateInstance item.instance, instance
+            item.instance.updateFrom instance
         else
             ItemController = _.find @item_controllers, (controller, name) ->
                  instance.constructor.className is name
