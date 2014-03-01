@@ -201,13 +201,17 @@ class Singleton extends Base
           @record.refresh(data)
 
       @record.trigger('ajaxSuccess', data, status, xhr)
-      options.success?.apply(@record) # Deprecated
+      if options.sucess?
+        console.warn 'Using "success" in options is deprecated, use "done" instead.'
+        options.success?.apply(@record) # Deprecated
       options.done?.apply(@record)
 
   failResponse: (options = {}) =>
     (xhr, statusText, error) =>
       @record.trigger('ajaxError', xhr, statusText, error)
-      options.error?.apply(@record) # Deprecated
+      if options.error?
+        console.warn 'Using "error" in options is deprecated, use "fail" instead.'
+        options.error?.apply(@record) # Deprecated
       options.fail?.apply(@record)
 
 # Ajax endpoint
