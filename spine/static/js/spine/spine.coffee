@@ -640,7 +640,7 @@ Spine.Model      = Model
 
 Module.extend.call(Spine, Events)
 
-# JavaScript compatability
+# JavaScript compatibility
 
 Module.create = Module.sub =
   Controller.create = Controller.sub =
