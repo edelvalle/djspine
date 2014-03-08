@@ -126,7 +126,7 @@ class Spine.Model extends Spine.Model
         @trigger 'error', error_data.errors
 
 
-class Spine?.FormController extends Spine.Controller
+class Spine.FormController extends Spine.Controller
     Model: null
     read_only: []
 
@@ -238,7 +238,7 @@ class Spine?.FormController extends Spine.Controller
 
 ENTER = 13
 
-class Spine?.ItemController extends Spine.FormController
+class Spine.ItemController extends Spine.FormController
 
     elements:
         '[contenteditable]': 'fields'
@@ -292,7 +292,7 @@ class Spine?.ItemController extends Spine.FormController
     on_saved: =>
 
 
-class Spine?.ModalController extends Spine.Controller
+class Spine.ModalController extends Spine.Controller
     BodyController: null
 
     elements:
@@ -329,7 +329,7 @@ class Spine?.ModalController extends Spine.Controller
 
 RIGHT_MOUSE_BUTTON = 3
 
-class Spine?.DropdownController extends Spine.Controller
+class Spine.DropdownController extends Spine.Controller
     @open: null
     selected_items_selector: '.ui-selected'
 
@@ -365,11 +365,11 @@ class Spine?.DropdownController extends Spine.Controller
         if Spine.DropdownController.open is this
             Spine.DropdownController.open = null
 
-if Spine?.DropdownController?
+if Spine.DropdownController?
     $(window).bind 'click', Spine.DropdownController.hide_open
 
 
-class Spine?.EditionDropdown extends Spine.DropdownController
+class Spine.EditionDropdown extends Spine.DropdownController
     events:
         'click .remove-action': 'remove_instances'
 
@@ -391,7 +391,7 @@ class Spine?.EditionDropdown extends Spine.DropdownController
         else
             @hide()
 
-class Spine?.ItemWithContextualMenu extends Spine.ItemController
+class Spine.ItemWithContextualMenu extends Spine.ItemController
     DropdownController: Spine.DropdownController
 
     events: _.extend(
@@ -417,7 +417,7 @@ class Spine?.ItemWithContextualMenu extends Spine.ItemController
         @menu_controller.show e
 
 
-class Spine?.ListController extends Spine.Controller
+class Spine.ListController extends Spine.Controller
     item_controllers: {}
     default_query: -> {}
     container: -> @el
@@ -458,7 +458,7 @@ class Spine?.ListController extends Spine.Controller
         item
 
 
-class Spine?.InfiniteListController extends Spine.ListController
+class Spine.InfiniteListController extends Spine.ListController
     ScrollingModel: null
 
     constructor: ->
