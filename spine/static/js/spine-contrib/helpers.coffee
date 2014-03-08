@@ -181,7 +181,8 @@ class Spine.FormController extends Spine.Controller
             @$('.alert').slideDown()
 
         for attr, msg of errors
-            @get_field attr
+            field = @get_field attr
+            field
                 .attr 'data-title', field.attr 'title'
                 .removeAttr 'title'
                 .tooltip title: msg
