@@ -236,6 +236,7 @@ class Spine.FormController extends Spine.Controller
     on_saved: =>
         @reset_form()
         @unbind_instance()
+        @init_instance force: true
         @parent?.hide?()
 
 ENTER = 13
