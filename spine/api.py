@@ -433,7 +433,7 @@ class SpineAPI(View):
         Takes some object and serialize it, then converts it to HttpResponse
         with the correct content type
 
-        If nothig is passed the response is empty
+        If nothing is passed the response is empty
         """
         if output != '':
             output = self._serialize(self._paginate(output))

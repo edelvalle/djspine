@@ -48,10 +48,11 @@ class SpineJSONEncoder(json.JSONEncoder):
                     if instance is not None:
                         instance = instance.pk
                     obj[field_name + '_id'] = instance
-                elif field_name in multiple:
+                elif field_name in multiple or hasattr(obj[field_name], 'all'):
                     qs = obj.pop(field_name).all()
                     obj[field_name + '_id'] = qs.values_list('pk', flat=True)
             return obj
+
         elif callable(obj):
             return obj()
 
