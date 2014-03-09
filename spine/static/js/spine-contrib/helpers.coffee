@@ -191,6 +191,7 @@ class Spine.FormController extends Spine.Controller
                 .addClass 'error'
 
     hide_errors: =>
+        @el.removeClass 'error'
         @control_groups.removeClass 'error'
         @fields.tooltip 'destroy'
         for field in @fields
