@@ -423,7 +423,7 @@ class Spine.ListController extends Spine.Controller
         @items = @items.without item
 
     get_item: (instance) ->
-        item = @items.find (item) ->
+        item = _.find @items, (item) ->
             instance.constructor is item.instance.constructor and (
                 (instance.cid is item.instance.cid) or
                 (instance.id and instance.id is item.instance.id)
@@ -455,7 +455,7 @@ class Spine.InfiniteListController extends Spine.ListController
     add: =>
         items_added = super
         @el.waypoint 'enable'
-        last_item = items_added.last()
+        last_item = _.last items_added
         if last_item?.instance.constructor is @ScrollingModel
             if @load_until_id
                 for item in items_added
