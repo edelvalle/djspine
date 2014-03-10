@@ -257,6 +257,7 @@ class Spine.ItemController extends Spine.FormController
 
     render_on_update: =>
         @render()
+        @post_render?()
         window.getSelection().removeAllRanges()
 
     render: =>
@@ -415,6 +416,7 @@ class Spine.ListController extends Spine.Controller
             item = @get_item instance
             if item and item not in @items
                 @container().append item.render()
+                item.post_render?()
                 @items.push item
                 added_items.push item
         added_items
