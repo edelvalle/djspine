@@ -86,17 +86,6 @@ def get_api_classes(api_module):
             yield attr
 
 
-def get_related_model(related_descriptor):
-    """
-    Returns the related model from a RelatedDescriptor
-    """
-    if hasattr(related_descriptor, 'field'):
-        return related_descriptor.field.rel.to
-
-    if hasattr(related_descriptor, 'related'):
-        return related_descriptor.related.model
-
-
 def select_fields(all_fields, suggested=None):
     if suggested is not None:
         suggested = set(suggested)

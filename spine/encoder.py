@@ -24,7 +24,7 @@ class SpineJSONEncoder(json.JSONEncoder):
             - Model into a dictionary with all its serializable fields
             - Call the callables
         """
-        from .api import api_handlers
+        from .api_meta import api_handlers
 
         if isinstance(obj, Decimal):
             return float(obj)

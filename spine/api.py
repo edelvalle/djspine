@@ -41,9 +41,9 @@ from django.views.generic import View
 from django.conf.urls import url
 from django.utils.translation import ugettext_lazy as _
 
-from .utils import get_app_label, flatten_dict, get_related_model
+from .utils import get_app_label, flatten_dict
 from .utils import select_fields, check_permissions
-from .api_meta import SpineAPIMeta, api_handlers
+from .api_meta import SpineAPIMeta
 from .encoder import SpineJSONEncoder
 
 _model_field_names_cache = {}
@@ -80,9 +80,7 @@ def get_field_names(model):
         for field_name, field in fields:
             field_type = type(field)
             if field_type in related_types:
-                related_model = get_related_model(field)
-                if related_model in api_handlers:
-                    related_types[field_type].append(field_name)
+                related_types[field_type].append(field_name)
 
         _model_field_names_cache[model] = (local, single, multiple)
 

@@ -25,7 +25,7 @@
 
 from django.conf.urls import patterns
 
-from .api import api_handlers
+from .api_meta import api_handlers
 
 
 api_urls = []
