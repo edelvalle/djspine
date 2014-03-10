@@ -329,6 +329,7 @@ class SpineAPI(View):
         else:
             if method in self.model_methods:
                 getattr(instance, method)(**self._real_data)
+                instance.save()
                 return self.success_response(instance)
             else:
                 return self.validation_error_response(
