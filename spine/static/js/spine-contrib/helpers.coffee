@@ -43,6 +43,10 @@ $.fn.setChecked = (value) ->
     else
         @removeAttr 'checked'
 
+$.fn.isInput = ->
+    _.all(element.tagName in ['SELECT', 'INPUT'] for element in this)
+
+
 # Underscore
 String::template ?= (args...) -> _.template this, args...
 String::escape ?= -> _.escape this
@@ -224,15 +228,14 @@ class Spine.ItemController extends Spine.FormController
         if value?
             if field.attr('type') is 'checkbox'
                 field.setChecked value
+            else if field.isInput()
+                field.val value
             else
-                if field[0]?.tagName in ['SELECT', 'INPUT']
-                    field.val value
-                else
-                    field.text value
+                field.text value
         else
             if field.attr('type') is 'checkbox'
                 field.is ':checked'
-            if field[0]?.tagName in ['SELECT', 'INPUT']
+            else if field.isInput()
                 field.val()
             else
                 field.text().trim()
