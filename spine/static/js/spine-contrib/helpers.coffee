@@ -107,13 +107,17 @@ class Spine.FormController extends Spine.Controller
 
     field_value: (name, value) ->
         field = @get_field name
-        if value? and field.length
+        if value?
             field.val value
+            field.filter('[type=checkbox]').setChecked value
             field.filter('img').attr 'src', value
-            field.filter('span').text String(value)
+            field.filter('span').text String value
             field.trigger 'change'
         else
-            field.val()
+            if field.attr('type') is 'checkbox'
+                field.is ':checked'
+            else
+                field.val()
 
     constructor: ->
         super
@@ -207,8 +211,8 @@ ENTER = 13
 class Spine.ItemController extends Spine.FormController
 
     elements:
-        '[contenteditable]': 'fields'
-        '[contenteditable]': 'control_groups'
+        '[name]': 'fields'
+        '[contenteditable], [name]': 'control_groups'
 
     events:
         'keydown [contenteditable][name]': 'trigger_field_change'
@@ -218,10 +222,20 @@ class Spine.ItemController extends Spine.FormController
     field_value: (name, value) ->
         field = @get_field name
         if value?
-            value = String(value)
-            field.text(value).val(value)
+            if field.attr('type') is 'checkbox'
+                field.setChecked value
+            else
+                if field[0]?.tagName in ['SELECT', 'INPUT']
+                    field.val value
+                else
+                    field.text value
         else
-            (field.text() or field.val() or '').trim()
+            if field.attr('type') is 'checkbox'
+                field.is ':checked'
+            if field[0]?.tagName in ['SELECT', 'INPUT']
+                field.val()
+            else
+                field.text().trim()
 
     bind_instance: =>
         super
