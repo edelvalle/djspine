@@ -113,3 +113,12 @@ def check_permissions(*actions):
             return method(self, request, *args, **kwargs)
         return wrapper
     return decorator
+
+
+def login_required(method):
+    @wraps(method)
+    def wrapper(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return HttpResponseForbidden('Error 403: Forbidden')
+        return method(self, request, *args, **kwargs)
+    return wrapper

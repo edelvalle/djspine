@@ -42,7 +42,7 @@ from django.conf.urls import url
 from django.utils.translation import ugettext_lazy as _
 
 from .utils import get_app_label, flatten_dict
-from .utils import select_fields, check_permissions
+from .utils import select_fields, check_permissions, login_required
 from .api_meta import SpineAPIMeta
 from .encoder import SpineJSONEncoder
 
@@ -252,7 +252,7 @@ class SpineAPI(View):
     _get_data_for_put = _get_data_for_post
 
     # GET request
-    @check_permissions('change', 'delete')
+    @login_required
     def get(self, request, id=None, *args, **kwargs):
         """
         Handle GET requests, either for a single resource or a collection.
