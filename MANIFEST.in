@@ -1,0 +1,13 @@
+include CHANGES.txt
+include INSTALL.txt
+include MANIFEST.in
+include README.txt
+include *.wsgi *.txt *.rst
+global-include *.coffee *.js
+global-include *.css
+global-include *.woff *.eot *.ttf
+global-include *.jpg *.png *.ico *.gif
+global-include *.po
+global-include *.html
+global-include *.png
+global-include *.otf

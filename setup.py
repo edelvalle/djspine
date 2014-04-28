@@ -34,7 +34,6 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    setup_requires=['setuptools-git'],
     install_requires=[
         'Django>=1.5,<1.7',
         'xoutil>=1.4.2,<1.6',
