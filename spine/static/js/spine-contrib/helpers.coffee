@@ -385,7 +385,7 @@ class Spine.ItemWithContextualMenu extends Spine.ItemController
 
     elements: _.extend(
         _.clone Spine.ItemController::elements
-        'ul.dropdown-menu': 'menu'
+        'ul.dropdown-menu:first': 'menu'
     )
 
     refreshElements: ->
