@@ -242,7 +242,7 @@ class Spine.ItemController extends Spine.FormController
 
     bind_instance: =>
         super
-        @instance.bind 'update', @render_on_update
+        @instance.bind 'update ajaxSuccess', @render_on_update
         @instance.bind 'destroy', @destroy
 
     trigger_field_change: (e) =>
