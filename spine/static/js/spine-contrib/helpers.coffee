@@ -470,16 +470,22 @@ class Spine.InfiniteListController extends Spine.ListController
                         item.el.addClass 'ui-selected'
                         @load_until_id = false
                         break
-
-            @load_more() if @infinite_load or @load_until_id
+            if (@infinite_load or
+                @load_until_id or
+                @view_port_smaller_than_window())
+                    @load_more()
         items_added
 
-    load_more: =>
-        @el.waypoint 'disable'
-        @page_number += 1
-        query = @default_query @ScrollingModel
-        query.p = @page_number
-        @ScrollingModel.fetch $.query query
+    view_port_smaller_than_window: ->
+         @el.height() <= $(window).height()
+
+    load_more: (direction='down') =>
+        if direction is 'down'
+            @el.waypoint 'disable'
+            @page_number += 1
+            query = @default_query @ScrollingModel
+            query.p = @page_number
+            @ScrollingModel.fetch $.query query
 
     activate_infinite_loading: =>
         @infinite_load = true
