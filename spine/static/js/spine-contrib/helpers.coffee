@@ -341,8 +341,8 @@ class Spine.DropdownController extends Spine.Controller
         if e?.pageX? and e?.pageY?
             do positionate_under_the_mouse = =>
                 @el.css
-                    left: e.pageX
-                    top: e.pageY
+                    left: e.offsetX
+                    top: e.offsetY
         Spine.DropdownController.set_open this
 
     hide: =>
