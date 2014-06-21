@@ -426,7 +426,7 @@ class Spine.ListController extends Spine.Controller
         added_items
 
     release_item: (item) =>
-        @items = @items.without item
+        @items = _.without @items, item
 
     get_item: (instance) ->
         item = _.find @items, (item) ->
