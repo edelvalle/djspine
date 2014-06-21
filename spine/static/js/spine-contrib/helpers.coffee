@@ -126,6 +126,7 @@ class Spine.FormController extends Spine.Controller
     constructor: ->
         super
         @init_instance()
+        @unbind()
 
     init_instance: (options) =>
         @instance = options.instance if options?.instance?
