@@ -1,6 +1,5 @@
 Spine   = @Spine or require('spine')
 isArray = Spine.isArray
-require = @require or ((value) -> eval(value))
 
 class Collection extends Spine.Module
   constructor: (options = {}) ->
@@ -20,11 +19,10 @@ class Collection extends Spine.Module
   count: ->
     @all().length
 
-  find: (id) ->
+  find: (id, notFound = @model.notFound) ->
     records = @select (rec) =>
       "#{rec.id}" is "#{id}"
-    throw new Error("\"#{@model.className}\" model could not find a record for the ID \"#{id}\"") unless records[0]
-    records[0]
+    return records[0] or notFound?(id)
 
   findAllByAttribute: (name, value) ->
     @model.select (rec) =>
@@ -74,6 +72,9 @@ class Instance extends Spine.Module
   exists: ->
     return if @record[@fkey] then @model.exists(@record[@fkey]) else false
 
+  find: ->
+    return @model.find(@record[@fkey])
+
   update: (value) ->
     return this unless value?
     unless value instanceof @model
@@ -109,8 +110,14 @@ underscore = (str) ->
      .replace(/-/g, '_')
      .toLowerCase()
 
+requireModel = (model) ->
+  if typeof model is 'string'
+    require?(model) or eval(model)
+  else
+    model
+
 association = (name, model, record, fkey, Ctor) ->
-  model = require(model) if typeof model is 'string'
+  model = requireModel(model) if typeof model is 'string'
   new Ctor(name: name, model: model, record: record, fkey: fkey)
 
 Spine.Model.extend
@@ -122,8 +129,7 @@ Spine.Model.extend
   belongsTo: (name, model, fkey) ->
     fkey ?= "#{underscore(singularize(name))}_id"
     @::[name] = (value) ->
-      association(name, model, @, fkey, Instance).update(value).exists()
-
+      association(name, model, @, fkey, Instance).update(value).find()
     @attributes.push(fkey)
 
   hasOne: (name, model, fkey) ->

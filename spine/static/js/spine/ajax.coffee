@@ -5,28 +5,29 @@ Queue  = $({})
 
 Ajax =
   getURL: (object) ->
-    object.url?() or object.url
+    if object.className?
+      @generateURL(object)
+    else
+      @generateURL(object, encodeURIComponent(object.id))
 
   getCollectionURL: (object) ->
-    if object
-      if typeof object.url is "function"
-        @generateURL(object)
-      else
-        object.url
+    @generateURL(object)
 
   getScope: (object) ->
     object.scope?() or object.scope
 
-  generateURL: (object, args...) ->
-    if object.className
-      collection = object.className.toLowerCase() + 's'
-      scope = Ajax.getScope(object)
-    else
-      if typeof object.constructor.url is 'string'
-        collection = object.constructor.url
+  getCollection: (object) ->
+    if object.url isnt object.generateURL
+      if typeof object.url is 'function'
+        object.url()
       else
-        collection = object.constructor.className.toLowerCase() + 's'
-      scope = Ajax.getScope(object) or Ajax.getScope(object.constructor)
+        object.url
+    else if object.className?
+      object.className.toLowerCase() + 's'
+
+  generateURL: (object, args...) ->
+    collection = Ajax.getCollection(object) or Ajax.getCollection(object.constructor)
+    scope = Ajax.getScope(object) or Ajax.getScope(object.constructor)
     args.unshift(collection)
     args.unshift(scope)
     # construct and clean url
@@ -59,6 +60,12 @@ Ajax =
   clearQueue: ->
     @queue []
 
+  config:
+    loadMethod: 'GET'
+    updateMethod: 'PUT'
+    createMethod: 'POST'
+    destroyMethod: 'DELETE'
+
 class Base
   defaults:
     dataType: 'json'
@@ -76,7 +83,8 @@ class Base
     promise  = deferred.promise()
     return promise unless Ajax.enabled
     settings = @ajaxSettings(params, defaults)
-
+    # prefer setting if exists else default is to parallelize 'GET' requests
+    parallel = if settings.parallel isnt undefined then settings.parallel else (settings.type is 'GET')
     request = (next) ->
       if record?.id?
         # for existing singleton, model id may have been updated
@@ -90,6 +98,8 @@ class Base
                 .done(deferred.resolve)
                 .fail(deferred.reject)
                 .then(next, next)
+      if parallel
+        Queue.dequeue()
 
     promise.abort = (statusText) ->
       return jqXHR.abort(statusText) if jqXHR
@@ -113,17 +123,21 @@ class Collection extends Base
   find: (id, params, options = {}) ->
     record = new @model(id: id)
     @ajaxQueue(
-      params,
-      type: 'GET',
-      url: options.url or Ajax.getURL(record)
+      params, {
+        type: options.method or Ajax.config.loadMethod
+        url: options.url or Ajax.getURL(record)
+        parallel: options.parallel
+      }
     ).done(@recordsResponse)
      .fail(@failResponse)
 
   all: (params, options = {}) ->
     @ajaxQueue(
-      params,
-      type: 'GET',
-      url: options.url or Ajax.getURL(@model)
+      params, {
+        type: options.method or Ajax.config.loadMethod
+        url: options.url or Ajax.getURL(@model)
+        parallel: options.parallel
+      }
     ).done(@recordsResponse)
      .fail(@failResponse)
 
@@ -151,29 +165,33 @@ class Singleton extends Base
   reload: (params, options = {}) ->
     @ajaxQueue(
       params, {
-        type: 'GET'
+        type: options.method or Ajax.config.loadMethod
         url: options.url
+        parallel: options.parallel
       }, @record
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
 
   create: (params, options = {}) ->
     @ajaxQueue(
-      params,
-      type: 'POST'
-      contentType: 'application/json'
-      data: @record.toJSON()
-      url: options.url or Ajax.getCollectionURL(@record)
+      params, {
+        type: options.method or Ajax.config.createMethod
+        contentType: 'application/json'
+        data: @record.toJSON()
+        url: options.url or Ajax.getCollectionURL(@record)
+        parallel: options.parallel
+      }
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
 
   update: (params, options = {}) ->
     @ajaxQueue(
       params, {
-        type: 'PUT'
+        type: options.method or Ajax.config.updateMethod
         contentType: 'application/json'
         data: if options.kwargs? then JSON.stringify(options.kwargs) else @record.toJSON()
         url: options.url
+        parallel: options.parallel
       }, @record
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
@@ -181,8 +199,9 @@ class Singleton extends Base
   destroy: (params, options = {}) ->
     @ajaxQueue(
       params, {
-        type: 'DELETE'
+        type: options.method or Ajax.config.destroyMethod
         url: options.url
+        parallel: options.parallel
       }, @record
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
@@ -201,34 +220,36 @@ class Singleton extends Base
           @record.refresh(data)
 
       @record.trigger('ajaxSuccess', data, status, xhr)
-      if options.sucess?
-        console.warn 'Using "success" in options is deprecated, use "done" instead.'
-        options.success?.apply(@record) # Deprecated
       options.done?.apply(@record)
 
   failResponse: (options = {}) =>
     (xhr, statusText, error) =>
       @record.trigger('ajaxError', xhr, statusText, error)
-      if options.error?
-        console.warn 'Using "error" in options is deprecated, use "fail" instead.'
-        options.error?.apply(@record) # Deprecated
       options.fail?.apply(@record)
 
 # Ajax endpoint
 Model.host = ''
 
+GenerateURL =
+  include: (args...) ->
+    args.unshift(encodeURIComponent(@id))
+    Ajax.generateURL(@, args...)
+  extend: (args...) ->
+    Ajax.generateURL(@, args...)
+
 Include =
   ajax: -> new Singleton(this)
 
-  url: (args...) ->
-    args.unshift(encodeURIComponent(@id))
-    Ajax.generateURL(@, args...)
+  generateURL: GenerateURL.include
+
+  url: GenerateURL.include
 
 Extend =
   ajax: -> new Collection(this)
 
-  url: (args...) ->
-    Ajax.generateURL(@, args...)
+  generateURL: GenerateURL.extend
+
+  url: GenerateURL.extend
 
 Model.Ajax =
   extended: ->
