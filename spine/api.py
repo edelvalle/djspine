@@ -40,6 +40,7 @@ from django.http import HttpResponse, Http404
 from django.views.generic import View
 from django.conf.urls import url
 from django.utils.translation import ugettext_lazy as _
+from django.views.decorators.cache import never_cache
 
 from .utils import get_app_label, flatten_dict
 from .utils import select_fields, check_permissions, login_required
@@ -479,6 +480,10 @@ class SpineAPI(View):
             cls._get_url_pattern(add_pk=True),
         )
         return urls
+
+    @classmethod
+    def as_view(cls, *args, **kwargs):
+        return never_cache(super(SpineAPI, cls).as_view(*args, **kwargs))
 
     @classmethod
     def _get_url_pattern(cls, add_pk=False):
