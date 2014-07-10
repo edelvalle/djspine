@@ -59,11 +59,29 @@ csrf_token = $.getCookie 'csrftoken'
 $(document).ajaxSend (e, xhr, settings) ->
     xhr.setRequestHeader 'X-CSRFToken', csrf_token
 
-$ ->
-    $loading = $ '#loading-img'
-    if $loading.length
-        $(document).ajaxStart -> $loading.fadeIn()
-        $(document).ajaxStop -> $loading.fadeOut 'fast'
+(->
+    # A simple way to stop users from killing pending ajax calls.
+    pending = 0
+    msg = gettext("Don't leave yet! I'm still working")  # TODO: i18n!!!
+    @addEventListener "beforeunload", (e)->
+        if pending > 0
+            (e or @.event).returnValue = msg
+            msg.preventDefault()
+            msg
+    $el = $()
+    $ ->
+       $el = $ '#loading-img'
+
+    $(document).ajaxSend (e, xhr, settings) ->
+        if pending is 0 and $el.length
+            $el.fadeIn()
+        pending++
+
+    $(document).ajaxComplete (e, xhr, settings)->
+        pending--
+        if pending is 0 and $el.length
+            $el.fadeOut 'fast'
+    )(window)
 
 
 
