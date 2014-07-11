@@ -100,11 +100,11 @@ class Spine.Model extends Spine.Model
             error_data = JSON.parse xhr.responseText
             if (not 'errors' of error_data or
                   not 'instance' of error_data)
-                throw SyntaxError
+                console.error 'Syntax error: ', xhr.responseText
+                return
         catch error
-            if xhr.status isnt 200
-                alert 'Error: there is a communication error!'
-            throw error
+            console.error 'ERROR: there is a communication error'
+            return
 
         @id = null if @cid is @id
         @updateFrom error_data.instance
