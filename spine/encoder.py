@@ -41,16 +41,23 @@ class SpineJSONEncoder(json.JSONEncoder):
         elif type(obj) in api_handlers:
             api_handler = api_handlers[type(obj)]
             local, single, multiple = api_handler.get_serialize_fields()
-            obj = object_to_dict(obj, chain(local, single, multiple))
-            for field_name in obj.keys():
-                if field_name in single:
-                    instance = obj.pop(field_name)
-                    if instance is not None:
-                        instance = instance.pk
-                    obj[field_name + '_id'] = instance
-                elif field_name in multiple or hasattr(obj[field_name], 'all'):
-                    qs = obj.pop(field_name).all()
-                    obj[field_name + '_id'] = qs.values_list('pk', flat=True)
+            obj = self.object_to_dict(obj, chain(local, single, multiple))
+            if obj is not None:
+                for field_name in obj.keys():
+                    is_multiple = (
+                        field_name in multiple or
+                        hasattr(obj[field_name], 'all')
+                    )
+                    if field_name in single:
+                        instance = obj.pop(field_name)
+                        if instance is not None:
+                            instance = instance.pk
+                        obj[field_name + '_id'] = instance
+                    elif is_multiple:
+                        qs = obj.pop(field_name).all()
+                        obj[field_name + '_id'] = qs.values_list(
+                            'pk', flat=True
+                        )
             return obj
 
         elif callable(obj):
@@ -58,3 +65,9 @@ class SpineJSONEncoder(json.JSONEncoder):
 
         msg = '%s: %s, is not JSON serializable' % (type(obj), repr(obj))
         raise TypeError(msg)
+
+    def object_to_dict(self, obj, fields):
+        try:
+            return object_to_dict(obj, fields)
+        except:
+            return None
