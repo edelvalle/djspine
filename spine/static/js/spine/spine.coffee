@@ -172,6 +172,7 @@ class Model extends Module
 
     records = @fromJSON(values)
     records = [records] unless isArray(records)
+    records = (record for record in records when record)
     @addRecord(record, options) for record in records
     @sort()
 
@@ -257,7 +258,10 @@ class Model extends Module
         if value instanceof this
           value
         else
-          new @(value)
+          if value isnt null
+            new @(value)
+          else
+            null
     else
       return objects if objects instanceof this
       new @(objects)
