@@ -1,38 +1,51 @@
+#!/usr/bin/env python
+# -*- encoding: utf-8 -*-
+#----------------------------------------------------------------------
+# spine.encoder
+#----------------------------------------------------------------------
+# Copyright (c) 2014 Merchise Autrement and Contributors
+# All rights reserved.
+#
+# Author: Eddy Ernesto del Valle Pino <eddy@merchise.org>
+# Contributors: see CONTRIBUTORS and HISTORY file
+#
+# This is free software; you can redistribute it and/or modify it under the
+# terms of the LICENCE attached (see LICENCE file) in the distribution
+# package.
 
-import json
-import datetime
-from decimal import Decimal
+
+from __future__ import (absolute_import as _py3_abs_imports,
+                        division as _py3_division,
+                        print_function as _py3_print,
+                        unicode_literals as _py3_unicode)
+
+
 from itertools import chain
 
 from django.db.models.fields.files import FieldFile
 from django.db.models.query import QuerySet
+from django.core.serializers.json import DjangoJSONEncoder
 
 from .utils import object_to_dict
 
 
-class SpineJSONEncoder(json.JSONEncoder):
-    """
-    JSON encoder that converts additional Python types to JSON.
-    """
+class SpineJSONEncoder(DjangoJSONEncoder):
+
+    """JSON encoder that converts additional Python types to JSON."""
+
     def default(self, obj):
-        """
-        Converts during json serialization:
-            - datetime objects to ISO-compatible strings
-            - RelatedManagers to QuerySet
-            - FieldFile to its download URL
-            - QuerySet to tuple
-            - Model into a dictionary with all its serializable fields
-            - Call the callables
+        """Convert during json serialization.
+
+        - datetime objects to ISO-compatible strings
+        - RelatedManagers to QuerySet
+        - FieldFile to its download URL
+        - QuerySet to tuple
+        - Model into a dictionary with all its serializable fields
+        - Call the callables
         """
         from .api_meta import api_handlers
 
-        if isinstance(obj, Decimal):
-            return float(obj)
-
-        if isinstance(obj, (datetime.datetime, datetime.date, datetime.time)):
-            return obj.isoformat()
-
-        elif isinstance(obj, FieldFile):
+        if isinstance(obj, FieldFile):
             return obj.url if obj else None
 
         elif isinstance(obj, QuerySet) or hasattr(obj, '__iter__'):
@@ -63,11 +76,18 @@ class SpineJSONEncoder(json.JSONEncoder):
         elif callable(obj):
             return obj()
 
-        msg = '%s: %s, is not JSON serializable' % (type(obj), repr(obj))
-        raise TypeError(msg)
+        else:
+            return super(SpineJSONEncoder, self).default(obj)
 
     def object_to_dict(self, obj, fields):
         try:
             return object_to_dict(obj, fields)
         except:
+            import logging
+            import traceback
+            logging.error(
+                "Can't serialize: %s, because: %s.",
+                obj,
+                traceback.format_exc()
+            )
             return None
