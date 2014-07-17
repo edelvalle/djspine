@@ -30,6 +30,7 @@ from .utils import object_to_dict
 
 
 class SpineJSONEncoder(DjangoJSONEncoder):
+
     """JSON encoder that converts additional Python types to JSON."""
 
     def default(self, obj):
