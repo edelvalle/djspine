@@ -32,18 +32,18 @@ from .utils import object_to_dict
 
 
 class SpineJSONEncoder(json.JSONEncoder):
-    """
-    JSON encoder that converts additional Python types to JSON.
-    """
+
+    """JSON encoder that converts additional Python types to JSON."""
+
     def default(self, obj):
-        """
-        Converts during json serialization:
-            - datetime objects to ISO-compatible strings
-            - RelatedManagers to QuerySet
-            - FieldFile to its download URL
-            - QuerySet to tuple
-            - Model into a dictionary with all its serializable fields
-            - Call the callables
+        """Convert during json serialization.
+
+        - datetime objects to ISO-compatible strings
+        - RelatedManagers to QuerySet
+        - FieldFile to its download URL
+        - QuerySet to tuple
+        - Model into a dictionary with all its serializable fields
+        - Call the callables
         """
         from .api_meta import api_handlers
 
