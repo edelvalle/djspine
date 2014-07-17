@@ -20,19 +20,16 @@ from __future__ import (absolute_import as _py3_abs_imports,
                         unicode_literals as _py3_unicode)
 
 
-import json
-import datetime
-from decimal import Decimal
 from itertools import chain
 
 from django.db.models.fields.files import FieldFile
 from django.db.models.query import QuerySet
+from django.core.serializers.json import DjangoJSONEncoder
 
 from .utils import object_to_dict
 
 
-class SpineJSONEncoder(json.JSONEncoder):
-
+class SpineJSONEncoder(DjangoJSONEncoder):
     """JSON encoder that converts additional Python types to JSON."""
 
     def default(self, obj):
@@ -47,13 +44,7 @@ class SpineJSONEncoder(json.JSONEncoder):
         """
         from .api_meta import api_handlers
 
-        if isinstance(obj, Decimal):
-            return float(obj)
-
-        if isinstance(obj, (datetime.datetime, datetime.date, datetime.time)):
-            return obj.isoformat()
-
-        elif isinstance(obj, FieldFile):
+        if isinstance(obj, FieldFile):
             return obj.url if obj else None
 
         elif isinstance(obj, QuerySet) or hasattr(obj, '__iter__'):
@@ -84,8 +75,8 @@ class SpineJSONEncoder(json.JSONEncoder):
         elif callable(obj):
             return obj()
 
-        msg = '%s: %s, is not JSON serializable' % (type(obj), repr(obj))
-        raise TypeError(msg)
+        else:
+            return super(SpineJSONEncoder, self).default(obj)
 
     def object_to_dict(self, obj, fields):
         try:
