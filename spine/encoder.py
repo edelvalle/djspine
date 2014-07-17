@@ -83,4 +83,11 @@ class SpineJSONEncoder(DjangoJSONEncoder):
         try:
             return object_to_dict(obj, fields)
         except:
+            import logging
+            import traceback
+            logging.error(
+                "Can't serialize: %s, because: %s.",
+                obj,
+                traceback.format_exc()
+            )
             return None
