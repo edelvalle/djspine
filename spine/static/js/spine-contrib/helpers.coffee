@@ -473,13 +473,12 @@ class Spine.InfiniteListController extends Spine.ListController
         @load_until_id = parseInt window.location.hash[1..]
         @load_until_id = false if @load_until_id is NaN
         @el.waypoint? @load_more,
-            continuous: false
             offset: 'bottom-in-view'
             enabled: false
 
     add: =>
         items_added = super
-        @el.waypoint 'enable'
+        @el.waypoint? 'enable'
         last_item = _.last items_added
         if last_item?.instance.constructor is @ScrollingModel
             if @load_until_id
@@ -500,7 +499,7 @@ class Spine.InfiniteListController extends Spine.ListController
 
     load_more: (direction='down') =>
         if direction is 'down'
-            @el.waypoint 'disable'
+            @el.waypoint? 'disable'
             @page_number += 1
             query = @default_query @ScrollingModel
             query.p = @page_number
