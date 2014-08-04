@@ -359,8 +359,9 @@ class Spine.DropdownController extends Spine.Controller
         if e?.pageX? and e?.pageY?
             do positionate_under_the_mouse = =>
                 @el.css
-                    left: e.offsetX
-                    top: e.offsetY
+                    position: 'fixed'
+                    left: e.clientX
+                    top: e.clientY
         Spine.DropdownController.set_open this
 
     hide: =>
@@ -471,14 +472,16 @@ class Spine.InfiniteListController extends Spine.ListController
         @infinite_load = false
         @load_until_id = parseInt window.location.hash[1..]
         @load_until_id = false if @load_until_id is NaN
-        @el.waypoint? @load_more,
-            continuous: false
-            offset: 'bottom-in-view'
-            enabled: false
+        @bottom_element = $('.load-more')
 
     add: =>
         items_added = super
-        @el.waypoint 'enable'
+        @bottom_element.removeClass 'spining'
+        if items_added.length
+            @bottom_element.waypoint @load_more,
+                continuous: false
+                triggerOnce: true
+                offset: 'bottom-in-view'
         last_item = _.last items_added
         if last_item?.instance.constructor is @ScrollingModel
             if @load_until_id
@@ -499,7 +502,9 @@ class Spine.InfiniteListController extends Spine.ListController
 
     load_more: (direction='down') =>
         if direction is 'down'
-            @el.waypoint 'disable'
+            @bottom_element
+                .waypoint 'destroy'
+                .addClass 'spining'
             @page_number += 1
             query = @default_query @ScrollingModel
             query.p = @page_number
