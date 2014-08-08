@@ -91,7 +91,8 @@ class Spine.Model extends Spine.Model
         @bind 'ajaxError', @processAjaxError
 
     updateFrom: (instance) ->
-        for attr, value of instance.attributes?() or instance
+        attributes = instance.attributes?() or instance
+        for attr, value of attributes
             @[attr] = value
         @trigger 'update'
 
