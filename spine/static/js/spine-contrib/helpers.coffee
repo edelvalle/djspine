@@ -81,7 +81,7 @@ $(document).ajaxSend (e, xhr, settings) ->
         pending--
         if pending is 0 and $el.length
             $el.fadeOut 'fast'
-    )(window)
+)(window)
 
 
 
