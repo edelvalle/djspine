@@ -281,7 +281,6 @@ class Spine.ItemController extends Spine.FormController
     render_on_update: =>
         @render()
         @post_render?()
-        window.getSelection().removeAllRanges()
 
     render: =>
         selected = @el.hasClass 'ui-selected'
