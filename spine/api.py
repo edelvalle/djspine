@@ -520,7 +520,6 @@ class SpineAPI(View):
             all_fields = get_field_names(cls.model)
             all_fields = select_fields(all_fields, cls.serialize_fields)
             cls._serialize_fields_cache = all_fields
-
         return cls._serialize_fields_cache
 
     @classmethod
@@ -542,8 +541,7 @@ class SpineAPI(View):
         return [
             f
             for f in fields
-            if f in model_fields and
-            not isinstance(
+            if f in model_fields and not isinstance(
                 getattr(cls.model, f, None),
                 ManyRelatedObjectsDescriptor
             )
