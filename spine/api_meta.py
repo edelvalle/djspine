@@ -21,9 +21,10 @@ def model_api_url(self):
 
 class SpineAPIMeta(type):
     def __new__(cls, *args, **kwargs):
-        """
-        Registers the new handler for future models serializations
-        Apply decorators to methods
+        """Register the new handler for future models serializations.
+
+        Apply decorators to methods.
+
         """
         new_class = super(SpineAPIMeta, cls).__new__(cls, *args, **kwargs)
 

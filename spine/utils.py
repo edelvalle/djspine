@@ -72,10 +72,7 @@ def object_to_dict(obj, attrs):
 
 
 def get_api_classes(api_module):
-    """
-    Given a module returns all the SpineAPI subclasses that
-    has a model deffined
-    """
+    """Return all the SpineAPI subclasses that has a `api_module`."""
     from .api import SpineAPI
     for attr_name in dir(api_module):
         attr = getattr(api_module, attr_name)
