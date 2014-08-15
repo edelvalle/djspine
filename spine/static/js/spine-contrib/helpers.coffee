@@ -81,7 +81,7 @@ $(document).ajaxSend (e, xhr, settings) ->
         pending--
         if pending is 0 and $el.length
             $el.fadeOut 'fast'
-    )(window)
+)(window)
 
 
 
@@ -91,7 +91,8 @@ class Spine.Model extends Spine.Model
         @bind 'ajaxError', @processAjaxError
 
     updateFrom: (instance) ->
-        for attr, value of instance.attributes?() or instance
+        attributes = instance.attributes?() or instance
+        for attr, value of attributes
             @[attr] = value
         @trigger 'update'
 
@@ -280,7 +281,6 @@ class Spine.ItemController extends Spine.FormController
     render_on_update: =>
         @render()
         @post_render?()
-        window.getSelection().removeAllRanges()
 
     render: =>
         selected = @el.hasClass 'ui-selected'
