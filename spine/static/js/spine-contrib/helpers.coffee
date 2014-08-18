@@ -421,6 +421,18 @@ class Spine.ItemWithContextualMenu extends Spine.ItemController
         @menu_controller.show e
 
 
+_.insertAt = (collection, item, index) ->
+    before = if index > 0 then collection[..index - 1] else []
+    after = collection[index..]
+    before.push item
+    before.concat after...
+
+_.removeAt = (collection, index) ->
+    before = if index > 0 then collection[..index-1] else []
+    after = collection[index+1..]
+    before.concat after...
+
+
 class Spine.ListController extends Spine.Controller
     item_controllers: {}
     default_query: -> {}
