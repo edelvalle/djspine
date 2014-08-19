@@ -2,7 +2,7 @@ include CHANGES.txt
 include INSTALL.txt
 include MANIFEST.in
 include README.txt
-global-include *.coffee *.js
+global-include *.js
 global-include *.css
 global-include *.woff *.eot *.ttf
 global-include *.jpg *.png *.ico *.gif
