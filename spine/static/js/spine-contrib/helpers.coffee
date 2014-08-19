@@ -421,31 +421,58 @@ class Spine.ItemWithContextualMenu extends Spine.ItemController
         @menu_controller.show e
 
 
+_.insertAt = (collection, item, index) ->
+    before = if index > 0 then collection[..index - 1] else []
+    after = collection[index..]
+    before.push item
+    before.concat after...
+
+_.removeAt = (collection, index) ->
+    before = if index > 0 then collection[..index-1] else []
+    after = collection[index+1..]
+    before.concat after...
+
+
 class Spine.ListController extends Spine.Controller
     item_controllers: {}
     default_query: -> {}
     container: -> @el
+    ordering_key: (instance) -> 0
 
     constructor: ->
         super
+        @items_keys = []
         @items = []
         for Model in (eval name for name of @item_controllers)
             Model.bind 'refresh', @add
             Model.fetch $.query @default_query Model
+
+    insert: (instance, item) ->
+        instance_key = @ordering_key instance
+        index = _.sortedIndex(@items_keys, instance_key)
+        @items_keys = _.insertAt @items_keys, instance_key, index
+        @items = _.insertAt @items, item, index
+        rendered_item = item.render()
+        if index > 0
+            $(rendered_item).insertAfter @container().children()[index - 1]
+        else
+            @container().prepend rendered_item
+        index
 
     add: (instances) =>
         added_items = []
         for instance in instances
             item = @get_item instance
             if item and item not in @items
-                @container().append item.render()
+                @insert instance, item
                 item.post_render?()
-                @items.push item
                 added_items.push item
         added_items
 
     release_item: (item) =>
-        @items = _.without @items, item
+        index = _.indexOf @items, item
+        @items_keys = _.removeAt @items_keys, index
+        @items = _.removeAt @items, index
 
     get_item: (instance) ->
         item = _.find @items, (item) ->

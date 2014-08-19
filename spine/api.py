@@ -51,11 +51,13 @@ _model_field_names_cache = {}
 
 
 def get_field_names(model):
-    """
-    Returns
+    """Return the fields of `model` in a triplete classified.
+
+    The resultant triplete has fallowing parts:
         local: fields declared in the model
         simple: "has one" relations
-        multple: "has many" relations
+        multiple: "has many" relations
+
     """
     global _model_field_names_cache
     if model not in _model_field_names_cache:
@@ -96,9 +98,7 @@ class BadRequest(HttpResponse):
 
 
 class SpineAPI(View):
-    """
-    Abstract class view, which makes it easy for subclasses to talk to
-    Spine.js.
+    """Base class view, which makes it easy talking to Spine.js.
 
     Supported operations (copied from spine.js docs):
         create -> POST   /api/app_name/ModelName
@@ -106,6 +106,7 @@ class SpineAPI(View):
         update -> PUT    /api/app_name/ModelName/id
         update -> PUT    /api/app_name/ModelName/id/method
         delete -> DELETE /api/app_name/ModelName/id
+
     """
 
     __metaclass__ = SpineAPIMeta
@@ -170,9 +171,10 @@ class SpineAPI(View):
 
     @property
     def base_queryset(self):
-        """
-        Override this to return another query set
+        """Override this to return another query set.
+
         Ex: self.model.objects.filter(user=self.request.user)
+
         """
         return self.model.objects
 
@@ -184,9 +186,7 @@ class SpineAPI(View):
 
     @property
     def data(self):
-        """
-        Returns the data passed in the request method data
-        """
+        """Return the data passed in the request method data."""
         if self._data is None:
             data = self._real_data
 
@@ -236,9 +236,7 @@ class SpineAPI(View):
         return getattr(self, decoder_name)
 
     def _get_data_for_get(self):
-        """
-        Decodes the data for GET requests
-        """
+        """Decode the data for GET requests."""
         keys = self.request.GET.keys()
         data = None
         if keys:
@@ -246,27 +244,21 @@ class SpineAPI(View):
         return self.JSONDecoder().decode(data or '{}')
 
     def _get_data_for_post(self):
-        """
-        Decodes the data for POST and PUT requests
-        """
+        """Decode the data for POST and PUT requests."""
         return self.JSONDecoder().decode(self.request.body)
     _get_data_for_put = _get_data_for_post
 
     # GET request
     @login_required
     def get(self, request, id=None, *args, **kwargs):
-        """
-        Handle GET requests, either for a single resource or a collection.
-        """
+        """Handle GET requests, either for a single resource or a collection."""
         if id is None:
             return self._get_collection()
         else:
             return self._get_single_item(id)
 
     def _get_single_item(self, id):
-        """
-        Handle a GET request for a single model instance.
-        """
+        """Handle a GET request for a single model instance."""
         try:
             instance = self.base_queryset.get(pk=id)
         except self.model.DoesNotExist:
@@ -274,8 +266,10 @@ class SpineAPI(View):
         return self.success_response(instance)
 
     def _get_collection(self):
-        """
-        Handle a GET request for a full collection (when no id was provided).
+        """Handle a GET request for a full collection.
+
+        The full collection is handled when no `id` is provided.
+
         """
         method_name = first_non_null(
             (
@@ -294,12 +288,12 @@ class SpineAPI(View):
     # POST & PUT requests
     @check_permissions('add')
     def post(self, request, *args, **kwargs):
-        """
-        Handle a POST request by adding a new model instance.
+        """Handle a POST request by adding a new model instance.
 
         This view will only do something if SpineAPI.add_form_class
         is specified by the subclass. This should be a ModelForm corresponding
         to the model.
+
         """
         if self.has_add_permissions(request):
             return self._process_form(self.add_form_class)
@@ -311,12 +305,12 @@ class SpineAPI(View):
 
     @check_permissions('change')
     def put(self, request, id=None, method=None):
-        """
-        Handle a PUT request by editing an existing model.
+        """Handle a PUT request by editing an existing model.
 
-        This view will only do something if SpineAPI.edit_form_class
-        is specified by the subclass. This should be a ModelForm corresponding
-        to the model.
+        This view will only do something if SpineAPI.edit_form_class is
+        specified by the subclass. This should be a ModelForm corresponding to
+        the model.
+
         """
         if id is None:
             return HttpResponse('PUT not supported', status=405)
@@ -361,9 +355,7 @@ class SpineAPI(View):
         )
 
     def _save_form(self, form):
-        """
-        Saves the form and returs the corresponding response
-        """
+        """Save the form and returs the corresponding response."""
         form.request = self.request
         if form.is_valid():
             item = form.save()
@@ -383,9 +375,10 @@ class SpineAPI(View):
     # Delete request
     @check_permissions('delete')
     def delete(self, request, *args, **kwargs):
-        """
-        Respond to DELETE requests by deleting the model and returning its
-        JSON representation.
+        """Respond to DELTE requests deleting the model instance.
+
+        Return the JSON representation of the deleted instance.
+
         """
         if 'id' not in kwargs:
             return HttpResponse(
@@ -402,22 +395,23 @@ class SpineAPI(View):
     # Response methods
 
     def success_response(self, *args, **kwargs):
-        """
-        Takes some object and serialize it, then converts it to HttpResponse
-        with the correct mimetype
+        """Take some object and serialize it.
 
-        If nothig is passed the response is empty
+        Converts it to HttpResponse with the correct mimetype.
+        If nothing is passed the response is empty.
+
         """
         return self.response(http_response_class=HttpResponse, *args, **kwargs)
 
     def validation_error_response(self, item, output, *args, **kwargs):
-        """
-        Return an BadRequest indicating that input validation failed.
+        """Return a BadRequest indicating that input validation failed.
 
-        The form_errors argument contains the contents of form.errors, and you
-        can override this method is you want to use a specific error
-        response format.
+        The `form_errors` argument contains the contents of form.errors, and you
+        can override this method is you want to use a specific error response
+        format.
+
         By default, the output is a simple text response.
+
         """
         output = {'instance': item, 'errors': output}
         return self.response(
@@ -429,20 +423,17 @@ class SpineAPI(View):
     # Response processing and paginating
 
     def response(self, output='', http_response_class=HttpResponse):
-        """
-        Takes some object and serialize it, then converts it to HttpResponse
-        with the correct content type
+        """Return a HttpResponse with the serialized object.
 
         If nothing is passed the response is empty
+
         """
         if output != '':
             output = self._serialize(self._paginate(output))
         return http_response_class(output, content_type='application/json')
 
     def _paginate(self, queryset):
-        """
-        Paginates the response if it is a QuerySet, a list or a tuple
-        """
+        """Paginate the response if it is a QuerySet, a list or a tuple."""
         if (isinstance(queryset, (QuerySet, list, tuple)) and
                 self.page_size is not None):
             offset = (self.page_number - 1) * self.page_size
@@ -450,10 +441,7 @@ class SpineAPI(View):
         return queryset
 
     def _serialize(self, data):
-        """
-        Serialize a queryset or anything into a JSON object that can be
-        consumed by Spine.js.
-        """
+        """Serialize a QuerySet or anything into JSON."""
         kwargs = {}
         if not self.request.is_ajax():
             kwargs['indent'] = 2
@@ -463,9 +451,9 @@ class SpineAPI(View):
 
     @classmethod
     def get_urls(cls):
-        """
-        Returns the URLs for the API handler, so you don't have to do anything
-        just:
+        """Return the URLs for the API handler.
+
+        So you don't have to do anything, just:
 
             api_urls = UserAPI.get_urls()
 
@@ -474,6 +462,7 @@ class SpineAPI(View):
                     name='users_edit'),
                 *api_urls
             )
+
         """
         urls = (
             cls._get_url_pattern(),
@@ -519,17 +508,18 @@ class SpineAPI(View):
 
     @classmethod
     def get_serialize_fields(cls):
-        """
-        Returns
-            local: regular fields declared in the model
+        """Return the fields of `model` in a triplete classified.
+
+        The resultant triplete has fallowing parts:
+            local: fields declared in the model
             simple: "has one" relations
-            multple: "has many" relations
+            multiple: "has many" relations
+
         """
         if not hasattr(cls, '_serialize_fields_cache'):
             all_fields = get_field_names(cls.model)
             all_fields = select_fields(all_fields, cls.serialize_fields)
             cls._serialize_fields_cache = all_fields
-
         return cls._serialize_fields_cache
 
     @classmethod
@@ -551,8 +541,7 @@ class SpineAPI(View):
         return [
             f
             for f in fields
-            if f in model_fields and
-            not isinstance(
+            if f in model_fields and not isinstance(
                 getattr(cls.model, f, None),
                 ManyRelatedObjectsDescriptor
             )
