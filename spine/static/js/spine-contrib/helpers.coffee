@@ -410,6 +410,8 @@ class Spine.ItemWithContextualMenu extends Spine.ItemController
 
     refreshElements: ->
         super
+        if @el.hasClass 'contextual-dropdown'
+            @el.on 'contextmenu', @show_dropdown
         @menu_controller?.release()
         @menu_controller = new @DropdownController el: @menu, item: this
 
@@ -495,11 +497,12 @@ class Spine.InfiniteListController extends Spine.ListController
 
     constructor: ->
         super
-        @page_number = 1
         @infinite_load = false
         @load_until_id = parseInt window.location.hash[1..]
         @load_until_id = false if @load_until_id is NaN
         @bottom_element = $('.load-more')
+
+    ids: -> (item.instance.id for item in @items)
 
     add: =>
         items_added = super
@@ -532,9 +535,8 @@ class Spine.InfiniteListController extends Spine.ListController
             @bottom_element
                 .waypoint 'destroy'
                 .addClass 'spining'
-            @page_number += 1
             query = @default_query @ScrollingModel
-            query.p = @page_number
+            query.__loaded_ids__ = @ids()
             @ScrollingModel.fetch $.query query
 
     activate_infinite_loading: =>

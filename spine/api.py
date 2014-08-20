@@ -135,7 +135,7 @@ class SpineAPI(View):
     # Set to an integer to enable GET pagination (at the specified page size)
     page_size = None
     # HTTP GET parameter to use for accessing pages (eg. /widgets?p=2)
-    page_param_name = 'p'
+    page_param_name = '__loaded_ids__'
 
     # Override these attributes with ModelForm instances to support PUT and
     #   POST requests:
@@ -179,8 +179,11 @@ class SpineAPI(View):
         return self.model.objects
 
     @property
-    def page_number(self):
-        return int(self._real_data.get(self.page_param_name, 1))
+    def loaded_ids(self):
+        if self.page_size:
+            return self._real_data.get(self.page_param_name, [])
+        else:
+            return None
 
     # Request data processing
 
@@ -251,7 +254,7 @@ class SpineAPI(View):
     # GET request
     @login_required
     def get(self, request, id=None, *args, **kwargs):
-        """Handle GET requests, either for a single resource or a collection."""
+        """Handle GET requests, either for single objects or a collection."""
         if id is None:
             return self._get_collection()
         else:
@@ -406,9 +409,9 @@ class SpineAPI(View):
     def validation_error_response(self, item, output, *args, **kwargs):
         """Return a BadRequest indicating that input validation failed.
 
-        The `form_errors` argument contains the contents of form.errors, and you
-        can override this method is you want to use a specific error response
-        format.
+        The `form_errors` argument contains the contents of form.errors, and
+        you can override this method is you want to use a specific error
+        response format.
 
         By default, the output is a simple text response.
 
@@ -434,10 +437,9 @@ class SpineAPI(View):
 
     def _paginate(self, queryset):
         """Paginate the response if it is a QuerySet, a list or a tuple."""
-        if (isinstance(queryset, (QuerySet, list, tuple)) and
-                self.page_size is not None):
-            offset = (self.page_number - 1) * self.page_size
-            queryset = queryset[offset:offset + self.page_size]
+        if self.page_size is not None and isinstance(queryset, QuerySet):
+            loaded_ids = self.loaded_ids
+            queryset = queryset.exclude(id__in=loaded_ids)[:self.page_size]
         return queryset
 
     def _serialize(self, data):
