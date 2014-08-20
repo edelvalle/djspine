@@ -409,9 +409,9 @@ class SpineAPI(View):
     def validation_error_response(self, item, output, *args, **kwargs):
         """Return a BadRequest indicating that input validation failed.
 
-        The `form_errors` argument contains the contents of form.errors, and you
-        can override this method is you want to use a specific error response
-        format.
+        The `form_errors` argument contains the contents of form.errors, and
+        you can override this method is you want to use a specific error
+        response format.
 
         By default, the output is a simple text response.
 
