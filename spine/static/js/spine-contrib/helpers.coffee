@@ -502,8 +502,6 @@ class Spine.InfiniteListController extends Spine.ListController
         @load_until_id = false if @load_until_id is NaN
         @bottom_element = $('.load-more')
 
-    ids: -> (item.instance.id for item in @items)
-
     add: =>
         items_added = super
         @bottom_element.removeClass 'spining'
@@ -536,7 +534,7 @@ class Spine.InfiniteListController extends Spine.ListController
                 .waypoint 'destroy'
                 .addClass 'spining'
             query = @default_query @ScrollingModel
-            query.__loaded_ids__ = @ids()
+            query.__amount_loaded__ = @ScrollingModel.count()
             @ScrollingModel.fetch $.query query
 
     activate_infinite_loading: =>
