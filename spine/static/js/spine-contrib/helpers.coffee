@@ -410,6 +410,8 @@ class Spine.ItemWithContextualMenu extends Spine.ItemController
 
     refreshElements: ->
         super
+        if @el.hasClass 'contextual-dropdown'
+            @el.on 'contextmenu', @show_dropdown
         @menu_controller?.release()
         @menu_controller = new @DropdownController el: @menu, item: this
 
