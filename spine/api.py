@@ -135,7 +135,7 @@ class SpineAPI(View):
     # Set to an integer to enable GET pagination (at the specified page size)
     page_size = None
     # HTTP GET parameter to use for accessing pages (eg. /widgets?p=2)
-    page_param_name = '__loaded_ids__'
+    page_param_name = '__amount_loaded__'
 
     # Override these attributes with ModelForm instances to support PUT and
     #   POST requests:
@@ -179,9 +179,9 @@ class SpineAPI(View):
         return self.model.objects
 
     @property
-    def loaded_ids(self):
+    def amount_loaded(self):
         if self.page_size:
-            return self._real_data.get(self.page_param_name, [])
+            return int(self._real_data.get(self.page_param_name, 0))
         else:
             return None
 
@@ -438,8 +438,8 @@ class SpineAPI(View):
     def _paginate(self, queryset):
         """Paginate the response if it is a QuerySet, a list or a tuple."""
         if self.page_size is not None and isinstance(queryset, QuerySet):
-            loaded_ids = self.loaded_ids
-            queryset = queryset.exclude(id__in=loaded_ids)[:self.page_size]
+            offset = self.amount_loaded + self.page_size
+            queryset = queryset[self.amount_loaded:offset]
         return queryset
 
     def _serialize(self, data):
