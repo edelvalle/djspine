@@ -497,6 +497,7 @@ class Spine.InfiniteListController extends Spine.ListController
 
     constructor: ->
         super
+        @last_amount = 0
         @infinite_load = false
         @load_until_id = parseInt window.location.hash[1..]
         @load_until_id = false if @load_until_id is NaN
@@ -529,12 +530,12 @@ class Spine.InfiniteListController extends Spine.ListController
          @el.height() <= $(window).height()
 
     load_more: (direction='down') =>
-        if direction is 'down'
+        if direction is 'down' and @ScrollingModel.count() isnt @last_amount
             @bottom_element
                 .waypoint 'destroy'
                 .addClass 'spining'
             query = @default_query @ScrollingModel
-            query.__amount_loaded__ = @ScrollingModel.count()
+            @last_amount = query.__amount_loaded__ = @ScrollingModel.count()
             @ScrollingModel.fetch $.query query
 
     activate_infinite_loading: =>
