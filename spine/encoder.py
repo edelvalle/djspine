@@ -24,12 +24,12 @@ from itertools import chain
 
 from django.db.models.fields.files import FieldFile
 from django.db.models.query import QuerySet
-from django.core.serializers.json import DjangoJSONEncoder
 
+from .encoder_streamer import JSONEncoderStreamer
 from .utils import object_to_dict
 
 
-class SpineJSONEncoder(DjangoJSONEncoder):
+class SpineJSONEncoder(JSONEncoderStreamer):
     """JSON encoder that converts additional Python types to JSON."""
 
     def default(self, obj):
@@ -41,6 +41,7 @@ class SpineJSONEncoder(DjangoJSONEncoder):
         - QuerySet to tuple
         - Model into a dictionary with all its serializable fields
         - Call the callables
+
         """
         from .api_meta import api_handlers
 

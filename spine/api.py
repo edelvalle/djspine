@@ -447,7 +447,9 @@ class SpineAPI(View):
         kwargs = {}
         if not self.request.is_ajax():
             kwargs['indent'] = 2
-        return self.JSONEncoder(**kwargs).encode(data)
+        encoder = self.JSONEncoder(**kwargs)
+        encode = getattr(encoder, 'iterencode', encoder.encode)
+        return encode(data)
 
     # Class methods
 
