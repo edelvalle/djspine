@@ -28,6 +28,7 @@ from itertools import chain
 
 from xoutil.string import cut_suffix
 from xoutil.iterators import first_non_null
+from xoutil.objects import get_first_of
 from dateutil.parser import parse as parse_date
 
 from django.db.models import DateField, TimeField, DateTimeField
@@ -36,7 +37,7 @@ from django.db.models.fields import related
 from django.db.models.fields.related import ManyRelatedObjectsDescriptor
 from django.forms.models import modelform_factory
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import HttpResponse, Http404
+from django.http import StreamingHttpResponse, HttpResponse, Http404
 from django.views.generic import View
 from django.conf.urls import url
 from django.utils.translation import ugettext_lazy as _
@@ -90,10 +91,11 @@ def get_field_names(model):
     return _model_field_names_cache[model]
 
 
-class BadRequest(HttpResponse):
-    def __init__(self, content='Bad request', status=400, *args, **kwargs):
+class BadRequest(StreamingHttpResponse):
+    def __init__(self, streaming_content='Bad request', status=400, *args,
+                 **kwargs):
         super(BadRequest, self).__init__(
-            content=content, status=status, *args, **kwargs
+            streaming_content=streaming_content, status=status, *args, **kwargs
         )
 
 
@@ -266,7 +268,7 @@ class SpineAPI(View):
             instance = self.base_queryset.get(pk=id)
         except self.model.DoesNotExist:
             raise Http404()
-        return self.success_response(instance)
+        return self.response(instance)
 
     def _get_collection(self):
         """Handle a GET request for a full collection.
@@ -286,7 +288,7 @@ class SpineAPI(View):
         queryset = method(**self.data)
         if queryset is None:
             queryset = []
-        return self.success_response(queryset)
+        return self.response(queryset)
 
     # POST & PUT requests
     @check_permissions('add')
@@ -328,7 +330,7 @@ class SpineAPI(View):
             if method in self.model_methods:
                 getattr(instance, method)(**self._real_data)
                 instance.save()
-                return self.success_response(instance)
+                return self.response(instance)
             else:
                 return self.validation_error_response(
                     instance,
@@ -362,7 +364,7 @@ class SpineAPI(View):
         form.request = self.request
         if form.is_valid():
             item = form.save()
-            return self.success_response(item)
+            return self.response(item)
         else:
             if form.instance.pk:
                 item = self.model.objects.get(pk=form.instance.pk)
@@ -391,20 +393,11 @@ class SpineAPI(View):
         qs = self.base_queryset.filter(id=kwargs['id'])
         if qs:
             qs.delete()
-            return self.success_response()
+            return self.response()
         else:
             raise Http404()
 
     # Response methods
-
-    def success_response(self, *args, **kwargs):
-        """Take some object and serialize it.
-
-        Converts it to HttpResponse with the correct mimetype.
-        If nothing is passed the response is empty.
-
-        """
-        return self.response(http_response_class=HttpResponse, *args, **kwargs)
 
     def validation_error_response(self, item, output, *args, **kwargs):
         """Return a BadRequest indicating that input validation failed.
@@ -425,12 +418,13 @@ class SpineAPI(View):
 
     # Response processing and paginating
 
-    def response(self, output='', http_response_class=HttpResponse):
+    def response(self, output='', http_response_class=None):
         """Return a HttpResponse with the serialized object.
 
         If nothing is passed the response is empty
 
         """
+        http_response_class = http_response_class or StreamingHttpResponse
         if output != '':
             output = self._serialize(self._paginate(output))
         return http_response_class(output, content_type='application/json')
@@ -448,7 +442,7 @@ class SpineAPI(View):
         if not self.request.is_ajax():
             kwargs['indent'] = 2
         encoder = self.JSONEncoder(**kwargs)
-        encode = getattr(encoder, 'iterencode', encoder.encode)
+        encode = get_first_of(encoder, 'iterencode', 'encode')
         return encode(data)
 
     # Class methods
