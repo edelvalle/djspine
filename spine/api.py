@@ -28,6 +28,7 @@ from itertools import chain
 
 from xoutil.string import cut_suffix
 from xoutil.iterators import first_non_null
+from xoutil.objects import get_first_of
 from dateutil.parser import parse as parse_date
 
 from django.db.models import DateField, TimeField, DateTimeField
@@ -441,7 +442,7 @@ class SpineAPI(View):
         if not self.request.is_ajax():
             kwargs['indent'] = 2
         encoder = self.JSONEncoder(**kwargs)
-        encode = getattr(encoder, 'iterencode', encoder.encode)
+        encode = get_first_of(encoder, 'iterencode', 'encode')
         return encode(data)
 
     # Class methods
