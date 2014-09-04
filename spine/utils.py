@@ -26,6 +26,7 @@
 import sys
 from functools import wraps
 from django.http import HttpResponseForbidden
+#  from django.db.models.fields.related import ManyRelatedManager
 
 
 def get_app_label(any_thing):
@@ -62,7 +63,7 @@ def object_to_dict(obj, attrs):
     for attr in attrs:
         try:
             value = getattr(obj, attr, None)
-            if callable(value):
+            if callable(value) and not hasattr(value, 'all'):
                 value = value()
             result[attr] = value
         except ValueError:
@@ -100,7 +101,7 @@ def check_permissions(*actions):
             if self.permission_checking:
                 has_perm = request.user.has_perm
                 app = self.model._meta.app_label
-                model = self.model._meta.module_name
+                model = self.model._meta.model_name
                 perms = [
                     '{app}.{action}_{model}'.format(**locals())
                     for action in actions
