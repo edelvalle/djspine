@@ -45,6 +45,9 @@ class SpineJSONEncoder(JSONEncoderStreamer):
         """
         from .api_meta import api_handlers
 
+        if hasattr(obj, '__json__'):
+            return obj.__json__()
+
         if isinstance(obj, FieldFile):
             return obj.url if obj else None
 
@@ -75,7 +78,6 @@ class SpineJSONEncoder(JSONEncoderStreamer):
 
         elif callable(obj):
             return obj()
-
         else:
             return super(SpineJSONEncoder, self).default(obj)
 
