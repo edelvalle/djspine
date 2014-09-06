@@ -37,7 +37,7 @@ setup(
     install_requires=[
         'Django>=1.5,<1.8',
         'xoutil>=1.6,<1.7',
-        'xoyuz>=0.2.5,<0.3',
+        'xoyuz>=0.2.7,<0.3',
         'python-dateutil>=2.1,<3'
     ],
 )
