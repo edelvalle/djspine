@@ -26,9 +26,9 @@
 import sys
 from functools import wraps
 from django.http import HttpResponseForbidden
-#  from django.db.models.fields.related import ManyRelatedManager
 
 
+# TODO: remove this use app registry.
 def get_app_label(any_thing):
     """
     If any thing is not a class it is converted to its type
@@ -72,6 +72,7 @@ def object_to_dict(obj, attrs):
     return result
 
 
+# TODO: remove this use app registry
 def get_api_classes(api_module):
     """Return all the SpineAPI subclasses that has a `api_module`."""
     from .api import SpineAPI
