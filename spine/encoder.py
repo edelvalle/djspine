@@ -84,12 +84,13 @@ class SpineJSONEncoder(JSONEncoderStreamer):
     def object_to_dict(self, obj, fields):
         try:
             return object_to_dict(obj, fields)
-        except:
+        except Exception as error:
             import logging
             import traceback
             logging.error(
-                "Can't serialize: %s, because: %s.",
+                "Can't serialize: %s, because: %s.\n\nTraceback: %s.",
                 obj,
+                error,
                 traceback.format_exc()
             )
             return None
