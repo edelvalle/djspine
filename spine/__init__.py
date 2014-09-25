@@ -24,4 +24,4 @@
 #
 #
 
-import loader
+default_app_config = 'spine.apps.SpineConfig'

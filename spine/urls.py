@@ -22,6 +22,7 @@
 #
 #
 
+# TODO: use appa registry
 
 from django.conf.urls import patterns
 

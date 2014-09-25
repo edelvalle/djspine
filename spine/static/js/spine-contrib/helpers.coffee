@@ -500,7 +500,7 @@ class Spine.InfiniteListController extends Spine.ListController
         @last_amount = 0
         @infinite_load = false
         @load_until_id = parseInt window.location.hash[1..]
-        @load_until_id = false if @load_until_id is NaN
+        @load_until_id = false if isNaN @load_until_id
         @bottom_element = $('.load-more')
 
     add: =>
