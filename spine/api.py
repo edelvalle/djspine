@@ -222,14 +222,9 @@ class SpineAPI(View):
 
     @property
     def _real_data(self):
-        content_type = self.request.META.get('CONTENT_TYPE') or ''
-        if content_type.startswith('application/json'):
-            try:
-                data = self._decode_request()
-            except ValueError:
-                raise BadRequest()
-        else:
-            # This is a hack!
+        try:
+            data = self._decode_request()
+        except ValueError:
             method = self.request.method.upper()
             method = 'POST' if method == 'PUT' else method
             data = flatten_dict(getattr(self.request, method))
