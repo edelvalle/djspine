@@ -75,10 +75,12 @@ $(document).ajaxSend (e, xhr, settings) ->
     $(document).ajaxSend (e, xhr, settings) ->
         if pending is 0 and $el.length
             $el.fadeIn()
-        pending++
+        if settings.type isnt 'GET'
+            pending++
 
     $(document).ajaxComplete (e, xhr, settings)->
-        pending--
+        if settings.type isnt 'GET'
+            pending--
         if pending is 0 and $el.length
             $el.fadeOut 'fast'
 )(window)
