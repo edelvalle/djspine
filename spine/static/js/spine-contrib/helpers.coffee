@@ -531,14 +531,15 @@ class Spine.InfiniteListController extends Spine.ListController
     view_port_smaller_than_window: ->
          @el.height() <= $(window).height()
 
-    load_more: (direction='down') =>
-        if direction is 'down' and @ScrollingModel.count() isnt @last_amount
-            @bottom_element
-                .waypoint 'destroy'
-                .addClass 'spining'
-            query = @default_query @ScrollingModel
-            @last_amount = query.__amount_loaded__ = @ScrollingModel.count()
-            @ScrollingModel.fetch $.query query
+    load_more: (direction) =>
+        if direction is 'down' and @ScrollingModel.count() isnt @last_amount or
+           direction is undefined
+                @bottom_element
+                    .waypoint 'destroy'
+                    .addClass 'spining'
+                query = @default_query @ScrollingModel
+                @last_amount = query.__amount_loaded__ = @ScrollingModel.count()
+                @ScrollingModel.fetch $.query query
 
     activate_infinite_loading: =>
         @infinite_load = true
