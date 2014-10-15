@@ -503,7 +503,12 @@ class Spine.InfiniteListController extends Spine.ListController
         @infinite_load = false
         @load_until_id = parseInt window.location.hash[1..]
         @load_until_id = false if isNaN @load_until_id
-        @bottom_element = $('.load-more')
+        @bottom_element = if (found = $('.load-more')).length
+            found
+        else
+            found = $('<div class="load-more"></div>')
+            found.insertAfter @el
+            found
 
     add: =>
         items_added = super
