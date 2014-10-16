@@ -37,6 +37,10 @@ $.setCookie = (name, value) ->
 $.getCookie = (name) ->
     $.getCookies()[name]
 
+#
+# Inputs
+#
+
 $.fn.setChecked = (value) ->
     if value
         @attr 'checked', 'checked'
