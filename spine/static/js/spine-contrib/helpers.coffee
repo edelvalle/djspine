@@ -20,6 +20,15 @@ $.getSelectedElements = (selector) ->
     else
         jQuery range
 
+$.getQueryStringArgs = (query=document.location.search) ->
+    qs = if query.length then query.substring 1 else ''
+    args = {}
+    items = qs.split '&'
+    for item in items
+        [name, value] = _.map item.split('='), decodeURIComponent
+        args[name] = value
+    args
+
 #
 # Cookies
 #
