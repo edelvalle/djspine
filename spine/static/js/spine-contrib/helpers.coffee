@@ -26,7 +26,12 @@ $.getQueryStringArgs = (query=document.location.search) ->
     items = qs.split '&'
     for item in items
         [name, value] = _.map item.split('='), decodeURIComponent
-        args[name] = value
+        if name in _.keys args
+            if not _.isArray args[name]
+                args[name] = [args[name]]
+            args[name].push value
+        else
+            args[name] = value
     args
 
 #
