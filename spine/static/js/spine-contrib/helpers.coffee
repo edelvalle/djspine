@@ -20,6 +20,20 @@ $.getSelectedElements = (selector) ->
     else
         jQuery range
 
+$.getQueryStringArgs = (query=document.location.search) ->
+    qs = if query.length then query.substring 1 else ''
+    args = {}
+    items = qs.split '&'
+    for item in items
+        [name, value] = _.map item.split('='), decodeURIComponent
+        if name in _.keys args
+            if not _.isArray args[name]
+                args[name] = [args[name]]
+            args[name].push value
+        else
+            args[name] = value
+    args
+
 #
 # Cookies
 #
@@ -36,6 +50,10 @@ $.setCookie = (name, value) ->
 
 $.getCookie = (name) ->
     $.getCookies()[name]
+
+#
+# Inputs
+#
 
 $.fn.setChecked = (value) ->
     if value
@@ -503,7 +521,12 @@ class Spine.InfiniteListController extends Spine.ListController
         @infinite_load = false
         @load_until_id = parseInt window.location.hash[1..]
         @load_until_id = false if isNaN @load_until_id
-        @bottom_element = $('.load-more')
+        @bottom_element = if (found = $('.load-more')).length
+            found
+        else
+            found = $('<div class="load-more"></div>')
+            found.insertAfter @el
+            found
 
     add: =>
         items_added = super
