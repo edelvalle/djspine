@@ -532,10 +532,7 @@ class Spine.InfiniteListController extends Spine.ListController
         items_added = super
         @bottom_element.removeClass 'spining'
         if items_added.length
-            @bottom_element.waypoint @load_more,
-                continuous: false
-                triggerOnce: true
-                offset: 'bottom-in-view'
+            @update_waypoint()
         last_item = _.last items_added
         if last_item?.instance.constructor is @ScrollingModel
             if @load_until_id
