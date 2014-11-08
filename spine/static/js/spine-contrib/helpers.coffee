@@ -545,7 +545,7 @@ class Spine.InfiniteListController extends Spine.ListController
                     @load_more()
         items_added
 
-    update_waypoint: (offset='bottom-in-view') ->
+    update_waypoint: (offset='bottom-in-view') =>
         @bottom_element.waypoint @load_more,
             continuous: false
             triggerOnce: true
