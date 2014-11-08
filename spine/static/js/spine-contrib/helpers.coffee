@@ -409,11 +409,8 @@ class Spine.EditionDropdown extends Spine.DropdownController
     remove_instances: (e) =>
         e?.preventDefault()
         references = @selected_references()
-        if confirm gettext 'Are you sure?'
-            for reference in references
-                eval(reference.model).destroy reference.id
-        else
-            @hide()
+        for reference in references
+            eval(reference.model).find(reference.id).trigger 'destroy'
 
 class Spine.ItemWithContextualMenu extends Spine.ItemController
     DropdownController: Spine.DropdownController
@@ -532,10 +529,7 @@ class Spine.InfiniteListController extends Spine.ListController
         items_added = super
         @bottom_element.removeClass 'spining'
         if items_added.length
-            @bottom_element.waypoint @load_more,
-                continuous: false
-                triggerOnce: true
-                offset: 'bottom-in-view'
+            @update_waypoint()
         last_item = _.last items_added
         if last_item?.instance.constructor is @ScrollingModel
             if @load_until_id
@@ -551,18 +545,26 @@ class Spine.InfiniteListController extends Spine.ListController
                     @load_more()
         items_added
 
+    update_waypoint: (offset='bottom-in-view') ->
+        @bottom_element.waypoint @load_more,
+            continuous: false
+            triggerOnce: true
+            offset: offset
+
     view_port_smaller_than_window: ->
          @el.height() <= $(window).height()
 
-    load_more: (direction) =>
-        if direction is 'down' and @ScrollingModel.count() isnt @last_amount or
-           direction is undefined
-                @bottom_element
-                    .waypoint 'destroy'
-                    .addClass 'spining'
-                query = @default_query @ScrollingModel
-                @last_amount = query.__amount_loaded__ = @ScrollingModel.count()
-                @ScrollingModel.fetch $.query query
+    load_more: (direction='down') =>
+        if direction is 'down' and @ScrollingModel.count() isnt @last_amount
+            @bottom_element
+                .waypoint 'destroy'
+                .addClass 'spining'
+            @load_query()
+
+    load_query: (last_amount=null) ->
+        query = @default_query @ScrollingModel
+        @last_amount = query.__amount_loaded__ = last_amount or @items.length
+        @ScrollingModel.fetch $.query query
 
     activate_infinite_loading: =>
         @infinite_load = true
