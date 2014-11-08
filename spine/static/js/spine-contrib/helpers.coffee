@@ -551,6 +551,12 @@ class Spine.InfiniteListController extends Spine.ListController
                     @load_more()
         items_added
 
+    update_waypoint: (offset='bottom-in-view') ->
+        @bottom_element.waypoint @load_more,
+            continuous: false
+            triggerOnce: true
+            offset: offset
+
     view_port_smaller_than_window: ->
          @el.height() <= $(window).height()
 
@@ -559,9 +565,12 @@ class Spine.InfiniteListController extends Spine.ListController
             @bottom_element
                 .waypoint 'destroy'
                 .addClass 'spining'
-            query = @default_query @ScrollingModel
-            @last_amount = query.__amount_loaded__ = @ScrollingModel.count()
-            @ScrollingModel.fetch $.query query
+            @load_query()
+
+    load_query: (last_amount=null) ->
+        query = @default_query @ScrollingModel
+        @last_amount = query.__amount_loaded__ = last_amount or @items.length
+        @ScrollingModel.fetch $.query query
 
     activate_infinite_loading: =>
         @infinite_load = true
