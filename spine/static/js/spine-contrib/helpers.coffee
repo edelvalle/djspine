@@ -451,6 +451,9 @@ _.removeAt = (collection, index) ->
     after = collection[index+1..]
     before.concat after...
 
+    destroy: =>
+        Phototagging.UndoController.destroy_items [this]
+
 
 class Spine.ListController extends Spine.Controller
     item_controllers: {}
