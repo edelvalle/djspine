@@ -409,11 +409,8 @@ class Spine.EditionDropdown extends Spine.DropdownController
     remove_instances: (e) =>
         e?.preventDefault()
         references = @selected_references()
-        if confirm gettext 'Are you sure?'
-            for reference in references
-                eval(reference.model).destroy reference.id
-        else
-            @hide()
+        for reference in references
+            eval(reference.model).find(reference.id).trigger 'destroy'
 
 class Spine.ItemWithContextualMenu extends Spine.ItemController
     DropdownController: Spine.DropdownController
@@ -441,6 +438,9 @@ class Spine.ItemWithContextualMenu extends Spine.ItemController
             $('.ui-selected').removeClass 'ui-selected'
             @el.addClass 'ui-selected'
         @menu_controller.show e
+
+    destroy: =>
+        Phototagging.UndoController.destroy_items [@]
 
 
 _.insertAt = (collection, item, index) ->
