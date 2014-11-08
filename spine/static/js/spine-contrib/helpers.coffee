@@ -314,6 +314,16 @@ class Spine.ItemController extends Spine.FormController
     unbind_instance: =>
     on_saved: =>
 
+    fadeOut: =>
+        @el.fadeOut
+            complete: =>
+                @trigger 'hide', this
+
+    fadeIn: =>
+        @el.fadeIn
+            complete: =>
+                @trigger 'show', this
+
 
 class Spine.ModalController extends Spine.Controller
     BodyController: null
@@ -439,6 +449,9 @@ class Spine.ItemWithContextualMenu extends Spine.ItemController
             @el.addClass 'ui-selected'
         @menu_controller.show e
 
+    destroy: =>
+        Phototagging.UndoController.destroy_items [this]
+
 
 _.insertAt = (collection, item, index) ->
     before = if index > 0 then collection[..index - 1] else []
@@ -450,9 +463,6 @@ _.removeAt = (collection, index) ->
     before = if index > 0 then collection[..index-1] else []
     after = collection[index+1..]
     before.concat after...
-
-    destroy: =>
-        Phototagging.UndoController.destroy_items [this]
 
 
 class Spine.ListController extends Spine.Controller
