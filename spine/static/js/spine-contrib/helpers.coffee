@@ -311,8 +311,8 @@ class Spine.ItemController extends Spine.FormController
     reset_form: =>
         @hide_errors()
 
-    unbind_instance: =>
-    on_saved: =>
+    unbind_instance: ->
+    on_saved: ->
 
     fadeOut: =>
         @el.fadeOut
