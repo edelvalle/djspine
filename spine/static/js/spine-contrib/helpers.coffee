@@ -311,8 +311,8 @@ class Spine.ItemController extends Spine.FormController
     reset_form: =>
         @hide_errors()
 
-    unbind_instance: =>
-    on_saved: =>
+    unbind_instance: ->
+    on_saved: ->
 
     fadeOut: =>
         @el.fadeOut
@@ -420,7 +420,10 @@ class Spine.EditionDropdown extends Spine.DropdownController
         e?.preventDefault()
         references = @selected_references()
         for reference in references
-            eval(reference.model).find(reference.id).trigger 'destroy'
+            @remove_instance eval(reference.model).find(reference.id)
+
+    remove_instance: (instance) ->
+        eval(reference.model).find(reference.id).destroy()
 
 class Spine.ItemWithContextualMenu extends Spine.ItemController
     DropdownController: Spine.DropdownController
